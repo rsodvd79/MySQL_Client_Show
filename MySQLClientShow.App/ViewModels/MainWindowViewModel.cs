@@ -350,14 +350,21 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
 
         var selectedFilter = SelectedClientFilter;
         var includeAll = string.Equals(selectedFilter, AllClientsFilterOption, StringComparison.Ordinal);
+        var matchingEntries = new List<GeneralLogEntry>();
 
         foreach (var entry in _allEntries)
         {
             if (includeAll ||
                 string.Equals(entry.UserHost, selectedFilter, StringComparison.OrdinalIgnoreCase))
             {
-                FilteredEntries.Add(entry);
+                matchingEntries.Add(entry);
             }
+        }
+
+        matchingEntries.Sort(static (left, right) => right.EventTime.CompareTo(left.EventTime));
+        foreach (var entry in matchingEntries)
+        {
+            FilteredEntries.Add(entry);
         }
 
         UpdateCounters();

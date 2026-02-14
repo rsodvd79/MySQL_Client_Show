@@ -15,6 +15,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
   - Max: `60000`
 - Filtro client tramite dropdown (`user_host`) con popolamento dinamico dai dati di polling.
 - Griglia risultati con timestamp, user host, SQL.
+- Ordinamento di default griglia: `Timestamp` decrescente (record piu recenti in alto).
 - Stato e conteggi in footer.
 - Finestra principale centrata automaticamente all'avvio (`CenterScreen`).
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.

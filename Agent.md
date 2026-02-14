@@ -24,6 +24,7 @@ Schermata principale con:
 4. **Dropdown**: `Client filter`
 5. **Numeric input**: `Polling interval (ms)` con default `1000`
 6. **DataGrid**: risultati (Timestamp, SQL, UserHost)
+   - ordinamento di default: `Timestamp` decrescente
 7. **Status bar**: stato e conteggi
 8. **Icona applicativa** coerente con il dominio MySQL/query monitor
 
@@ -84,7 +85,7 @@ Componenti principali:
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
 - `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`).
 - `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire.
-- `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown.
+- `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), ordinamento default griglia per timestamp decrescente, buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown.
 - `MySQLClientShow.App/Services/MySqlGeneralLogService.cs`: connessione MySQL, enable/disable general log, query su `mysql.general_log`.
 - `MySQLClientShow.App/Services/JsonAppConfigurationStore.cs`: lettura/scrittura configurazione JSON.
 - `MySQLClientShow.App/Models/GeneralLogEntry.cs`: DTO righe log.
