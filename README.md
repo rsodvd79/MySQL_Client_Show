@@ -101,6 +101,3 @@ MySQLClientShow.App/
   Configuration/AppConfiguration.cs
   Assets/mysql-client-show.ico
 ```
-
-## Licenza
-Aggiungi qui il tipo di licenza scelto (es. MIT).
