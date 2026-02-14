@@ -40,6 +40,8 @@ Schermata principale con:
 3. Premendo **Stop**:
    - esegue `SET GLOBAL general_log = 'OFF';`
    - ferma il polling e chiude la connessione
+4. In uscita applicazione:
+   - se il polling e' attivo, viene imposta la procedura di stop prima della chiusura
 
 ---
 
@@ -76,10 +78,12 @@ Implementato e compilabile.
 
 Componenti principali:
 - `README.md`: documentazione GitHub (overview, setup, uso, configurazione JSON, note operative).
+- `.gitignore`: esclusione artefatti di build (`bin/`, `obj/`) dal versionamento.
 - `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` e inclusione risorse `Assets`.
 - `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
 - `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra.
+- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire.
 - `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro live, buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown.
 - `MySQLClientShow.App/Services/MySqlGeneralLogService.cs`: connessione MySQL, enable/disable general log, query su `mysql.general_log`.
 - `MySQLClientShow.App/Services/JsonAppConfigurationStore.cs`: lettura/scrittura configurazione JSON.
@@ -112,6 +116,7 @@ Verifica effettuata:
    - usare `Client filter` per filtrare `UserHost`
    - premere `Stop` per disattivare `general_log` e chiudere sessione
 4. Chiusura app:
+   - se il polling e' attivo viene eseguito automaticamente `Stop`
    - la configurazione corrente (`ConnectionString`, `ClientFilter`, `PollingIntervalMs`) viene salvata automaticamente su JSON
 
 ---

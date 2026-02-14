@@ -17,6 +17,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Griglia risultati con timestamp, user host, SQL.
 - Stato e conteggi in footer.
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
+- In chiusura app, se il polling e' attivo viene forzata la procedura di `Stop` prima dell'uscita.
 
 ## Stack tecnico
 - .NET 8
@@ -44,6 +45,7 @@ dotnet run --project MySQLClientShow.App
 3. Premi `Start`.
 4. Filtra i client con `Client filter` (opzionale).
 5. Premi `Stop` per fermare il monitoraggio e disattivare `general_log`.
+6. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
 
 ## Configurazione JSON
 La configurazione utente viene persistita in:

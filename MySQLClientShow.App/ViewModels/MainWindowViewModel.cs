@@ -139,6 +139,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         };
     }
 
+    public Task StopPollingForExitAsync()
+    {
+        return StopAsync();
+    }
+
     private bool CanStart() => !IsRunning && !string.IsNullOrWhiteSpace(ConnectionString);
 
     private bool CanStop() => IsRunning && !_isStopping;
@@ -161,8 +166,22 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
 
     private async Task StopAsync()
     {
-        if (!IsRunning || _pollingTask is null || _pollingCts is null)
+        if (_pollingTask is null || _pollingCts is null)
         {
+            return;
+        }
+
+        if (_isStopping)
+        {
+            try
+            {
+                await _pollingTask.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected while another stop is already in progress.
+            }
+
             return;
         }
 

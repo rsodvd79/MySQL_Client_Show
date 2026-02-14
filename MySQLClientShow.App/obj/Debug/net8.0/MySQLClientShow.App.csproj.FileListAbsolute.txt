@@ -65,3 +65,4 @@ C:\Users\rsodv\Desktop\MySQL_Client_Show\MySQLClientShow.App\bin\Debug\net8.0\ru
 C:\Users\rsodv\Desktop\MySQL_Client_Show\MySQLClientShow.App\obj\Debug\net8.0\MySQLCli.84324D41.Up2Date
 C:\Users\rsodv\Desktop\MySQL_Client_Show\MySQLClientShow.App\obj\Debug\net8.0\MySQLClientShow.App.genruntimeconfig.cache
 C:\Users\rsodv\Desktop\MySQL_Client_Show\MySQLClientShow.App\obj\Debug\net8.0\ref\MySQLClientShow.App.dll
+C:\Users\rsodv\Desktop\MySQL_Client_Show\MySQLClientShow.App\obj\Debug\net8.0\MySQLClientShow.App.sourcelink.json
