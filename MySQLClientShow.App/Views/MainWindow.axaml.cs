@@ -1,5 +1,11 @@
+using System.Collections;
+using System.Globalization;
+using System.Text;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
+using MySQLClientShow.App.Models;
 using MySQLClientShow.App.ViewModels;
 
 namespace MySQLClientShow.App.Views;
@@ -18,6 +24,70 @@ public partial class MainWindow : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+
+    private async void OnExportCsvClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel viewModel)
+        {
+            return;
+        }
+
+        List<GeneralLogEntry> rows;
+        try
+        {
+            rows = GetRowsForExport();
+        }
+        catch (Exception ex)
+        {
+            viewModel.NotifyStatus($"Errore preparazione export CSV: {ex.Message}");
+            return;
+        }
+
+        if (rows.Count == 0)
+        {
+            viewModel.NotifyStatus("Nessuna riga visibile da esportare.");
+            return;
+        }
+
+        if (!StorageProvider.CanSave)
+        {
+            viewModel.NotifyStatus("Export CSV non disponibile: provider storage non supporta il salvataggio.");
+            return;
+        }
+
+        var options = new FilePickerSaveOptions
+        {
+            Title = "Esporta dati griglia in CSV",
+            SuggestedFileName = $"mysql-general-log-{DateTime.Now:yyyyMMdd-HHmmss}",
+            DefaultExtension = "csv",
+            ShowOverwritePrompt = true,
+            FileTypeChoices = new List<FilePickerFileType>
+            {
+                new("CSV")
+                {
+                    Patterns = new[] { "*.csv" },
+                    MimeTypes = new[] { "text/csv" }
+                }
+            }
+        };
+
+        var targetFile = await StorageProvider.SaveFilePickerAsync(options);
+        if (targetFile is null)
+        {
+            viewModel.NotifyStatus("Export CSV annullato.");
+            return;
+        }
+
+        try
+        {
+            await WriteCsvAsync(targetFile, rows);
+            viewModel.NotifyStatus($"Export CSV completato: {rows.Count} righe in {targetFile.Name}.");
+        }
+        catch (Exception ex)
+        {
+            viewModel.NotifyStatus($"Errore export CSV: {ex.Message}");
+        }
     }
 
     private async void OnClosing(object? sender, WindowClosingEventArgs e)
@@ -50,5 +120,63 @@ public partial class MainWindow : Window
 
         _closeAfterStop = true;
         Close();
+    }
+
+    private List<GeneralLogEntry> GetRowsForExport()
+    {
+        var logDataGrid = this.FindControl<DataGrid>("LogDataGrid");
+        if (logDataGrid is null)
+        {
+            return new List<GeneralLogEntry>();
+        }
+
+        try
+        {
+            if (logDataGrid.CollectionView is IEnumerable sortedItems)
+            {
+                return sortedItems.OfType<GeneralLogEntry>().ToList();
+            }
+        }
+        catch (NullReferenceException)
+        {
+            // DataGrid internals can be uninitialized in some lifecycle states.
+        }
+
+        if (logDataGrid.ItemsSource is IEnumerable sourceItems)
+        {
+            return sourceItems.OfType<GeneralLogEntry>().ToList();
+        }
+
+        return new List<GeneralLogEntry>();
+    }
+
+    private static async Task WriteCsvAsync(IStorageFile targetFile, IReadOnlyList<GeneralLogEntry> rows)
+    {
+        await using var stream = await targetFile.OpenWriteAsync();
+        stream.SetLength(0);
+        await using var writer = new StreamWriter(stream, new UTF8Encoding(false));
+
+        await writer.WriteLineAsync("Timestamp,UserHost,SQL");
+
+        foreach (var row in rows)
+        {
+            var timestamp = row.EventTime.ToString("yyyy-MM-dd HH:mm:ss.ffffff", CultureInfo.InvariantCulture);
+            var line = string.Join(',',
+                EscapeCsvField(timestamp),
+                EscapeCsvField(row.UserHost),
+                EscapeCsvField(row.SqlText));
+
+            await writer.WriteLineAsync(line);
+        }
+    }
+
+    private static string EscapeCsvField(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return "\"\"";
+        }
+
+        return $"\"{value.Replace("\"", "\"\"")}\"";
     }
 }

@@ -158,6 +158,16 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         return StopAsync();
     }
 
+    public void NotifyStatus(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        StatusMessage = message;
+    }
+
     private bool CanStart() => !IsRunning && !string.IsNullOrWhiteSpace(ConnectionString);
 
     private bool CanStop() => IsRunning && !_isStopping;

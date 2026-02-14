@@ -16,6 +16,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Filtro client tramite dropdown (`user_host`) con popolamento dinamico dai dati di polling.
 - Griglia risultati con timestamp, user host, SQL.
 - Ordinamento di default griglia: `Timestamp` decrescente (record piu recenti in alto).
+- Export CSV dei dati visibili in griglia, mantenendo filtro e ordinamento correnti.
 - Stato e conteggi in footer.
 - Finestra principale centrata automaticamente all'avvio (`CenterScreen`).
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
@@ -46,8 +47,9 @@ dotnet run --project MySQLClientShow.App
 2. Imposta il polling (default `1000 ms`).
 3. Premi `Start`.
 4. Seleziona un client dalla dropdown `Client filter` (opzionale, lista aggiornata automaticamente quando arrivano nuovi client).
-5. Premi `Stop` per fermare il monitoraggio e disattivare `general_log`.
-6. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
+5. Premi `Export CSV` per salvare i dati attualmente visibili in griglia (stesso filtro/sort).
+6. Premi `Stop` per fermare il monitoraggio e disattivare `general_log`.
+7. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
 
 ## Configurazione JSON
 La configurazione utente viene persistita in:

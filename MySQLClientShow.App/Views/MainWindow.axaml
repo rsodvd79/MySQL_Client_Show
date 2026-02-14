@@ -20,7 +20,7 @@
     <Grid Grid.Row="1"
           Margin="0,12,0,12"
           RowDefinitions="Auto,Auto"
-          ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+          ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto">
       <TextBlock Grid.Row="0"
                  Grid.Column="0"
                  Margin="0,0,10,0"
@@ -50,9 +50,16 @@
 
       <Button Grid.Row="0"
               Grid.Column="4"
+              Margin="0,0,10,0"
               Command="{Binding ClearCommand}"
               Content="Clear"
               MinWidth="90" />
+
+      <Button Grid.Row="0"
+              Grid.Column="5"
+              Click="OnExportCsvClick"
+              Content="Export CSV"
+              MinWidth="110" />
 
       <TextBlock Grid.Row="1"
                  Grid.Column="0"
@@ -88,7 +95,8 @@
                  Text="Range: 200-60000" />
     </Grid>
 
-    <DataGrid Grid.Row="2"
+    <DataGrid x:Name="LogDataGrid"
+              Grid.Row="2"
               AutoGenerateColumns="False"
               CanUserReorderColumns="True"
               CanUserResizeColumns="True"
