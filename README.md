@@ -16,6 +16,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Filtro client tramite dropdown (`user_host`) con popolamento dinamico dai dati di polling.
 - Griglia risultati con timestamp, user host, SQL.
 - Stato e conteggi in footer.
+- Finestra principale centrata automaticamente all'avvio (`CenterScreen`).
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
 - In chiusura app, se il polling e' attivo viene forzata la procedura di `Stop` prima dell'uscita.
 

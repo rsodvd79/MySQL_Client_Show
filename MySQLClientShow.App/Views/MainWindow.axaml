@@ -5,6 +5,7 @@
         x:Class="MySQLClientShow.App.Views.MainWindow"
         Title="MySQL Client Show"
         Icon="/Assets/mysql-client-show.ico"
+        WindowStartupLocation="CenterScreen"
         Width="1280"
         Height="800"
         MinWidth="960"
