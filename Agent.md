@@ -130,7 +130,7 @@ Verifica effettuata:
 ---
 
 ## Regola di manutenzione documento
-Da questo momento `Agent.md` deve essere aggiornato a ogni modifica funzionale o architetturale.
+Da questo momento `AGENT.md` deve essere aggiornato a ogni modifica funzionale o architetturale.
 
 Checklist minima da aggiornare ogni volta:
 1. **Stato implementazione** (cosa e' stato aggiunto/modificato)
