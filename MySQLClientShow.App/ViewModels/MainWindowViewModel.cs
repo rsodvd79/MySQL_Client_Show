@@ -12,6 +12,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     public const int DefaultPollingIntervalMs = 1000;
     public const int MinPollingIntervalMs = 200;
     public const int MaxPollingIntervalMs = 60000;
+    private const string AllClientsFilterOption = "(Tutti i client)";
 
     private const int MaxEntriesInMemory = 5000;
     private const int MaxDedupeKeys = 10000;
@@ -22,7 +23,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     private readonly Queue<string> _dedupeQueue = new();
 
     private string _connectionString = string.Empty;
-    private string _clientFilter = string.Empty;
+    private string _selectedClientFilter = AllClientsFilterOption;
     private string _statusMessage = "Pronto. Inserisci la connection string.";
     private int _pollingIntervalMs = DefaultPollingIntervalMs;
     private bool _isRunning;
@@ -40,6 +41,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     }
 
     public ObservableCollection<GeneralLogEntry> FilteredEntries { get; } = new();
+    public ObservableCollection<string> ClientFilters { get; } = new() { AllClientsFilterOption };
 
     public AsyncRelayCommand StartCommand { get; }
 
@@ -61,11 +63,23 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
 
     public string ClientFilter
     {
-        get => _clientFilter;
+        get => string.Equals(SelectedClientFilter, AllClientsFilterOption, StringComparison.Ordinal)
+            ? string.Empty
+            : SelectedClientFilter;
+        set => SelectedClientFilter = value;
+    }
+
+    public string SelectedClientFilter
+    {
+        get => _selectedClientFilter;
         set
         {
-            if (SetProperty(ref _clientFilter, value))
+            var normalizedValue = NormalizeClientFilterOption(value);
+            EnsureClientFilterOption(normalizedValue);
+
+            if (SetProperty(ref _selectedClientFilter, normalizedValue))
             {
+                OnPropertyChanged(nameof(ClientFilter));
                 ApplyClientFilter();
             }
         }
@@ -289,6 +303,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
                 continue;
             }
 
+            EnsureClientFilterOption(row.UserHost);
+
             var key = $"{row.EventTime.Ticks}|{row.UserHost}|{row.SqlText}";
             if (!_dedupeSet.Add(key))
             {
@@ -332,11 +348,13 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     {
         FilteredEntries.Clear();
 
-        var filter = ClientFilter.Trim();
+        var selectedFilter = SelectedClientFilter;
+        var includeAll = string.Equals(selectedFilter, AllClientsFilterOption, StringComparison.Ordinal);
+
         foreach (var entry in _allEntries)
         {
-            if (string.IsNullOrWhiteSpace(filter) ||
-                entry.UserHost.Contains(filter, StringComparison.OrdinalIgnoreCase))
+            if (includeAll ||
+                string.Equals(entry.UserHost, selectedFilter, StringComparison.OrdinalIgnoreCase))
             {
                 FilteredEntries.Add(entry);
             }
@@ -379,6 +397,37 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         }
 
         return value;
+    }
+
+    private static string NormalizeClientFilterOption(string? option)
+    {
+        return string.IsNullOrWhiteSpace(option) ? AllClientsFilterOption : option.Trim();
+    }
+
+    private void EnsureClientFilterOption(string? option)
+    {
+        var normalizedOption = NormalizeClientFilterOption(option);
+        if (string.Equals(normalizedOption, AllClientsFilterOption, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        for (var i = 0; i < ClientFilters.Count; i++)
+        {
+            if (string.Equals(ClientFilters[i], normalizedOption, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+        }
+
+        var insertAt = 1;
+        while (insertAt < ClientFilters.Count &&
+               string.Compare(ClientFilters[insertAt], normalizedOption, StringComparison.OrdinalIgnoreCase) < 0)
+        {
+            insertAt++;
+        }
+
+        ClientFilters.Insert(insertAt, normalizedOption);
     }
 
     private static void RunOnUiThread(Action action)

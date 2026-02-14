@@ -13,7 +13,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
   - Default: `1000`
   - Min: `200`
   - Max: `60000`
-- Filtro live per client (`user_host`).
+- Filtro client tramite dropdown (`user_host`) con popolamento dinamico dai dati di polling.
 - Griglia risultati con timestamp, user host, SQL.
 - Stato e conteggi in footer.
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
@@ -43,7 +43,7 @@ dotnet run --project MySQLClientShow.App
 1. Inserisci la connection string.
 2. Imposta il polling (default `1000 ms`).
 3. Premi `Start`.
-4. Filtra i client con `Client filter` (opzionale).
+4. Seleziona un client dalla dropdown `Client filter` (opzionale, lista aggiornata automaticamente quando arrivano nuovi client).
 5. Premi `Stop` per fermare il monitoraggio e disattivare `general_log`.
 6. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
 

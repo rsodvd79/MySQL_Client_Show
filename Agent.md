@@ -21,7 +21,7 @@ Schermata principale con:
 1. **TextBox**: `Connection string`
 2. **Button**: `Start` -> attiva general log su TABLE e avvia polling
 3. **Button**: `Stop` -> spegne general log e ferma polling
-4. **TextBox**: `Client filter`
+4. **Dropdown**: `Client filter`
 5. **Numeric input**: `Polling interval (ms)` con default `1000`
 6. **DataGrid**: risultati (Timestamp, SQL, UserHost)
 7. **Status bar**: stato e conteggi
@@ -82,9 +82,9 @@ Componenti principali:
 - `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` e inclusione risorse `Assets`.
 - `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
-- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra.
+- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra.
 - `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire.
-- `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro live, buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown.
+- `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown.
 - `MySQLClientShow.App/Services/MySqlGeneralLogService.cs`: connessione MySQL, enable/disable general log, query su `mysql.general_log`.
 - `MySQLClientShow.App/Services/JsonAppConfigurationStore.cs`: lettura/scrittura configurazione JSON.
 - `MySQLClientShow.App/Models/GeneralLogEntry.cs`: DTO righe log.
@@ -113,7 +113,7 @@ Verifica effettuata:
    - impostare `Polling (ms)` (default `1000`, range `200..60000`)
    - premere `Start`
    - monitorare risultati nel DataGrid
-   - usare `Client filter` per filtrare `UserHost`
+   - usare `Client filter` (dropdown auto-popolata) per filtrare `UserHost`
    - premere `Stop` per disattivare `general_log` e chiudere sessione
 4. Chiusura app:
    - se il polling e' attivo viene eseguito automaticamente `Stop`
