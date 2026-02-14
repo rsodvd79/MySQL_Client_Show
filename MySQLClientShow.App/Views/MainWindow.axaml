@@ -1,0 +1,126 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="MySQLClientShow.App.Views.MainWindow"
+        Title="MySQL Client Show"
+        Icon="/Assets/mysql-client-show.ico"
+        Width="1280"
+        Height="800"
+        MinWidth="960"
+        MinHeight="600"
+        mc:Ignorable="d">
+  <Grid Margin="16"
+        RowDefinitions="Auto,Auto,*,Auto">
+    <TextBlock Text="MySQL Client Show"
+               FontSize="24"
+               FontWeight="SemiBold" />
+
+    <Grid Grid.Row="1"
+          Margin="0,12,0,12"
+          RowDefinitions="Auto,Auto"
+          ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+      <TextBlock Grid.Row="0"
+                 Grid.Column="0"
+                 Margin="0,0,10,0"
+                 VerticalAlignment="Center"
+                 Text="Connection string" />
+
+      <TextBox Grid.Row="0"
+               Grid.Column="1"
+               Margin="0,0,10,0"
+               Watermark="Server=127.0.0.1;Port=3306;User ID=root;Password=...;"
+               Text="{Binding ConnectionString, Mode=TwoWay}"
+               HorizontalAlignment="Stretch" />
+
+      <Button Grid.Row="0"
+              Grid.Column="2"
+              Margin="0,0,10,0"
+              Command="{Binding StartCommand}"
+              Content="Start"
+              MinWidth="90" />
+
+      <Button Grid.Row="0"
+              Grid.Column="3"
+              Margin="0,0,10,0"
+              Command="{Binding StopCommand}"
+              Content="Stop"
+              MinWidth="90" />
+
+      <Button Grid.Row="0"
+              Grid.Column="4"
+              Command="{Binding ClearCommand}"
+              Content="Clear"
+              MinWidth="90" />
+
+      <TextBlock Grid.Row="1"
+                 Grid.Column="0"
+                 Margin="0,10,10,0"
+                 VerticalAlignment="Center"
+                 Text="Client filter" />
+
+      <TextBox Grid.Row="1"
+               Grid.Column="1"
+               Margin="0,10,10,0"
+               Watermark="Filtra per user_host (es. app_user@10.0.)"
+               Text="{Binding ClientFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+      <TextBlock Grid.Row="1"
+                 Grid.Column="2"
+                 Margin="0,10,10,0"
+                 VerticalAlignment="Center"
+                 Text="Polling (ms)" />
+
+      <NumericUpDown Grid.Row="1"
+                     Grid.Column="3"
+                     Margin="0,10,10,0"
+                     Minimum="200"
+                     Maximum="60000"
+                     Increment="100"
+                     Width="120"
+                     Value="{Binding PollingIntervalMs, Mode=TwoWay}" />
+
+      <TextBlock Grid.Row="1"
+                 Grid.Column="4"
+                 Margin="0,10,0,0"
+                 VerticalAlignment="Center"
+                 Text="Range: 200-60000" />
+    </Grid>
+
+    <DataGrid Grid.Row="2"
+              AutoGenerateColumns="False"
+              CanUserReorderColumns="True"
+              CanUserResizeColumns="True"
+              CanUserSortColumns="True"
+              GridLinesVisibility="Horizontal"
+              IsReadOnly="True"
+              ItemsSource="{Binding FilteredEntries}">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Timestamp"
+                            Width="245"
+                            Binding="{Binding EventTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss.ffffff}}" />
+        <DataGridTextColumn Header="UserHost"
+                            Width="300"
+                            Binding="{Binding UserHost}" />
+        <DataGridTextColumn Header="SQL"
+                            Width="*"
+                            Binding="{Binding SqlText}" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <Border Grid.Row="3"
+            Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+            CornerRadius="6"
+            Padding="8">
+      <Grid ColumnDefinitions="*,Auto,Auto">
+        <TextBlock Text="{Binding StatusMessage}" />
+        <TextBlock Grid.Column="1"
+                   Margin="20,0,0,0"
+                   Text="{Binding TotalRows, StringFormat=Totali: {0}}" />
+        <TextBlock Grid.Column="2"
+                   Margin="20,0,0,0"
+                   Text="{Binding VisibleRows, StringFormat=Visibili: {0}}" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
