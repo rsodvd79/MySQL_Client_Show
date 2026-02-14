@@ -75,6 +75,7 @@ ORDER BY event_time ASC;
 Implementato e compilabile.
 
 Componenti principali:
+- `README.md`: documentazione GitHub (overview, setup, uso, configurazione JSON, note operative).
 - `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` e inclusione risorse `Assets`.
 - `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
@@ -130,3 +131,12 @@ Checklist minima da aggiornare ogni volta:
 2. **Verifica** (build/test eseguiti e risultato)
 3. **Runbook** (se cambiano comandi o flusso operativo)
 4. **Prerequisiti** (se cambiano permessi o dipendenze)
+
+## Regola di manutenzione README
+Da questo momento `README.md` deve essere aggiornato a ogni modifica rilevante del progetto.
+
+Checklist minima da aggiornare ogni volta:
+1. **Funzionalita** (nuove feature o cambiamenti comportamentali)
+2. **Setup/Avvio rapido** (nuovi prerequisiti o comandi)
+3. **Configurazione** (nuovi campi/config file/path)
+4. **Note operative** (limiti, impatti performance, sicurezza)
