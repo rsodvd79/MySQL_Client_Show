@@ -38,6 +38,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         StartCommand = new AsyncRelayCommand(StartAsync, CanStart);
         StopCommand = new AsyncRelayCommand(StopAsync, CanStop);
         ClearCommand = new RelayCommand(ClearBuffer);
+
+#if DEBUG
+        SeedDebugEntries();
+#endif
     }
 
     public ObservableCollection<GeneralLogEntry> FilteredEntries { get; } = new();
@@ -301,6 +305,54 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         ResetBuffer();
         StatusMessage = IsRunning ? "Buffer svuotato. Monitoraggio attivo." : "Buffer svuotato.";
     }
+
+#if DEBUG
+    private void SeedDebugEntries()
+    {
+        if (_allEntries.Count > 0)
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        var sampleRows = new List<GeneralLogEntry>
+        {
+            new()
+            {
+                EventTime = now.AddMilliseconds(-950),
+                UserHost = "debug_user@appsrv-01 [10.0.10.21]",
+                SqlText = "SELECT id, name, created_at FROM customers WHERE status = 'ACTIVE' ORDER BY created_at DESC LIMIT 25;"
+            },
+            new()
+            {
+                EventTime = now.AddMilliseconds(-760),
+                UserHost = "report_user@bi-node [10.0.20.35]",
+                SqlText = "SELECT DATE(created_at) AS day, COUNT(*) AS total_orders FROM orders WHERE created_at >= NOW() - INTERVAL 7 DAY GROUP BY DATE(created_at) ORDER BY day;"
+            },
+            new()
+            {
+                EventTime = now.AddMilliseconds(-540),
+                UserHost = "api_user@backend-02 [10.0.11.12]",
+                SqlText = "UPDATE inventory SET quantity = quantity - 1, updated_at = NOW() WHERE product_id = 4123 AND warehouse_id = 3;"
+            },
+            new()
+            {
+                EventTime = now.AddMilliseconds(-310),
+                UserHost = "batch_user@worker-01 [10.0.30.9]",
+                SqlText = "INSERT INTO audit_log (event_type, payload, created_at) VALUES ('ORDER_SYNC', '{\"orderId\":10294,\"status\":\"completed\"}', NOW());"
+            },
+            new()
+            {
+                EventTime = now.AddMilliseconds(-120),
+                UserHost = "admin@localhost [127.0.0.1]",
+                SqlText = "DELETE FROM session_tokens WHERE expires_at < NOW() - INTERVAL 30 DAY;"
+            }
+        };
+
+        AppendEntries(sampleRows);
+        StatusMessage = "Modalita debug: caricati 5 dati di esempio.";
+    }
+#endif
 
     private void AppendEntries(IReadOnlyList<GeneralLogEntry> rows)
     {

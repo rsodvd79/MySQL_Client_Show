@@ -28,6 +28,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Finestra principale centrata automaticamente all'avvio (`CenterScreen`).
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
 - In chiusura app, se il polling e' attivo viene forzata la procedura di `Stop` prima dell'uscita.
+- In build `Debug`, all'avvio vengono caricati automaticamente 5 record demo nella griglia.
 
 ## Stack tecnico
 - .NET 8
@@ -96,6 +97,7 @@ ORDER BY event_time ASC;
 ## Note importanti
 - `general_log` puo avere impatto sulle performance: usare con criterio, specialmente su ambienti di produzione.
 - La connection string e salvata in chiaro nel file JSON locale: proteggi il profilo utente/machine.
+- I record demo sono presenti solo in modalita `Debug` e vengono azzerati quando premi `Start` (reset buffer).
 
 ## Struttura progetto
 ```text
