@@ -2,9 +2,11 @@ using System.Collections;
 using System.Globalization;
 using System.Text;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
+using Avalonia.VisualTree;
 using MySQLClientShow.App.Models;
 using MySQLClientShow.App.ViewModels;
 
@@ -24,6 +26,51 @@ public partial class MainWindow : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+
+    private async void OnLogDataGridDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (e.Source is not Control sourceControl ||
+            sourceControl.FindAncestorOfType<DataGridRow>() is null)
+        {
+            return;
+        }
+
+        if (sender is not DataGrid logDataGrid ||
+            logDataGrid.SelectedItem is not GeneralLogEntry selectedEntry)
+        {
+            return;
+        }
+
+        await OpenQueryDetailAsync(selectedEntry);
+    }
+
+    private async void OnOpenQueryDetailFromContextMenuClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem)
+        {
+            return;
+        }
+
+        var contextMenu = menuItem.FindAncestorOfType<ContextMenu>();
+        if (contextMenu?.PlacementTarget is DataGridRow row &&
+            row.DataContext is GeneralLogEntry rowEntry)
+        {
+            await OpenQueryDetailAsync(rowEntry);
+            return;
+        }
+
+        var logDataGrid = this.FindControl<DataGrid>("LogDataGrid");
+        if (logDataGrid?.SelectedItem is GeneralLogEntry selectedEntry)
+        {
+            await OpenQueryDetailAsync(selectedEntry);
+        }
+    }
+
+    private async Task OpenQueryDetailAsync(GeneralLogEntry entry)
+    {
+        var queryDetailWindow = new QueryDetailWindow(entry);
+        await queryDetailWindow.ShowDialog(this);
     }
 
     private async void OnExportCsvClick(object? sender, RoutedEventArgs e)

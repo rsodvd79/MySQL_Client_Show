@@ -74,7 +74,7 @@ ORDER BY event_time ASC;
 
 ---
 
-## Stato implementazione (aggiornato al 2026-02-14)
+## Stato implementazione (aggiornato al 2026-02-15)
 Implementato e compilabile.
 
 Componenti principali:
@@ -83,9 +83,12 @@ Componenti principali:
 - `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` e inclusione risorse `Assets`.
 - `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
-- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`).
-- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire.
+- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`).
+- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query.
+- `MySQLClientShow.App/Views/QueryDetailWindow.axaml`: finestra dedicata al dettaglio query (timestamp, client, SQL) con area testo read-only e scrollbar.
+- `MySQLClientShow.App/Views/QueryDetailWindow.axaml.cs`: code-behind finestra dettaglio, apertura modal, copia SQL negli appunti, chiusura.
 - `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), ordinamento default griglia per timestamp decrescente, buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown.
+- `MySQLClientShow.App/Utilities/SqlQueryFormatter.cs`: formatter SQL leggero per visualizzare query multi-linea in modo leggibile nella finestra di dettaglio.
 - `MySQLClientShow.App/Services/MySqlGeneralLogService.cs`: connessione MySQL, enable/disable general log, query su `mysql.general_log`.
 - `MySQLClientShow.App/Services/JsonAppConfigurationStore.cs`: lettura/scrittura configurazione JSON.
 - `MySQLClientShow.App/Models/GeneralLogEntry.cs`: DTO righe log.
@@ -115,6 +118,8 @@ Verifica effettuata:
    - premere `Start`
    - monitorare risultati nel DataGrid
    - usare `Client filter` (dropdown auto-popolata) per filtrare `UserHost`
+   - aprire dettaglio query con doppio click su riga oppure con `tasto destro` -> `Apri dettaglio query`
+   - nella finestra dettaglio usare `Copia SQL` per copiare la query formattata
    - premere `Stop` per disattivare `general_log` e chiudere sessione
 4. Chiusura app:
    - se il polling e' attivo viene eseguito automaticamente `Stop`

@@ -102,8 +102,19 @@
               CanUserResizeColumns="True"
               CanUserSortColumns="True"
               GridLinesVisibility="Horizontal"
+              DoubleTapped="OnLogDataGridDoubleTapped"
               IsReadOnly="True"
               ItemsSource="{Binding FilteredEntries}">
+      <DataGrid.Styles>
+        <Style Selector="DataGridRow">
+          <Setter Property="ContextMenu">
+            <ContextMenu>
+              <MenuItem Header="Apri dettaglio query"
+                        Click="OnOpenQueryDetailFromContextMenuClick" />
+            </ContextMenu>
+          </Setter>
+        </Style>
+      </DataGrid.Styles>
       <DataGrid.Columns>
         <DataGridTextColumn Header="Timestamp"
                             Width="245"

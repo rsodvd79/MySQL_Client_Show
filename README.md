@@ -16,6 +16,13 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Filtro client tramite dropdown (`user_host`) con popolamento dinamico dai dati di polling.
 - Griglia risultati con timestamp, user host, SQL.
 - Ordinamento di default griglia: `Timestamp` decrescente (record piu recenti in alto).
+- Apertura dettaglio query SQL:
+  - doppio click su una riga della griglia
+  - menu contestuale su riga (`tasto destro` -> `Apri dettaglio query`)
+- Finestra dettaglio query con:
+  - SQL formattata per leggibilita
+  - scrollbar verticale/orizzontale
+  - azione `Copia SQL`
 - Export CSV dei dati visibili in griglia, mantenendo filtro e ordinamento correnti.
 - Stato e conteggi in footer.
 - Finestra principale centrata automaticamente all'avvio (`CenterScreen`).
@@ -47,9 +54,11 @@ dotnet run --project MySQLClientShow.App
 2. Imposta il polling (default `1000 ms`).
 3. Premi `Start`.
 4. Seleziona un client dalla dropdown `Client filter` (opzionale, lista aggiornata automaticamente quando arrivano nuovi client).
-5. Premi `Export CSV` per salvare i dati attualmente visibili in griglia (stesso filtro/sort).
-6. Premi `Stop` per fermare il monitoraggio e disattivare `general_log`.
-7. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
+5. Apri il dettaglio SQL di una riga con doppio click oppure con `tasto destro` -> `Apri dettaglio query`.
+6. Nella finestra dettaglio usa `Copia SQL` per copiare la query formattata.
+7. Premi `Export CSV` per salvare i dati attualmente visibili in griglia (stesso filtro/sort).
+8. Premi `Stop` per fermare il monitoraggio e disattivare `general_log`.
+9. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
 
 ## Configurazione JSON
 La configurazione utente viene persistita in:
@@ -95,9 +104,13 @@ MySQLClientShow.App/
   App.axaml
   Program.cs
   Views/MainWindow.axaml
+  Views/MainWindow.axaml.cs
+  Views/QueryDetailWindow.axaml
+  Views/QueryDetailWindow.axaml.cs
   ViewModels/MainWindowViewModel.cs
   Services/MySqlGeneralLogService.cs
   Services/JsonAppConfigurationStore.cs
   Configuration/AppConfiguration.cs
+  Utilities/SqlQueryFormatter.cs
   Assets/mysql-client-show.ico
 ```

@@ -1,0 +1,66 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="MySQLClientShow.App.Views.QueryDetailWindow"
+        Title="Dettaglio Query SQL"
+        WindowStartupLocation="CenterOwner"
+        Width="1040"
+        Height="720"
+        MinWidth="720"
+        MinHeight="500"
+        mc:Ignorable="d">
+  <Grid Margin="16"
+        RowDefinitions="Auto,Auto,*,Auto">
+    <TextBlock Text="Dettaglio Query SQL"
+               FontSize="22"
+               FontWeight="SemiBold" />
+
+    <Grid Grid.Row="1"
+          Margin="0,12,0,12"
+          RowDefinitions="Auto,Auto"
+          ColumnDefinitions="Auto,*">
+      <TextBlock Grid.Row="0"
+                 Grid.Column="0"
+                 Margin="0,0,10,8"
+                 VerticalAlignment="Center"
+                 Text="Timestamp" />
+      <TextBlock Grid.Row="0"
+                 Grid.Column="1"
+                 Margin="0,0,0,8"
+                 Text="{Binding EventTimeText}" />
+
+      <TextBlock Grid.Row="1"
+                 Grid.Column="0"
+                 Margin="0,0,10,0"
+                 VerticalAlignment="Center"
+                 Text="Client" />
+      <TextBlock Grid.Row="1"
+                 Grid.Column="1"
+                 TextWrapping="Wrap"
+                 Text="{Binding UserHost}" />
+    </Grid>
+
+    <TextBox Grid.Row="2"
+             IsReadOnly="True"
+             AcceptsReturn="True"
+             TextWrapping="NoWrap"
+             FontFamily="Consolas, Cascadia Mono, Menlo, Monospace"
+             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+             ScrollViewer.VerticalScrollBarVisibility="Auto"
+             Text="{Binding FormattedSql}" />
+
+    <StackPanel Grid.Row="3"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Spacing="8"
+                Margin="0,12,0,0">
+      <Button Content="Copia SQL"
+              MinWidth="120"
+              Click="OnCopySqlClick" />
+      <Button Content="Chiudi"
+              MinWidth="100"
+              Click="OnCloseClick" />
+    </StackPanel>
+  </Grid>
+</Window>
