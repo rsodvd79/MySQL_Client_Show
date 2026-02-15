@@ -28,6 +28,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Export CSV dei dati visibili in griglia, mantenendo filtro e ordinamento correnti.
 - Stato e conteggi in footer.
 - Finestra principale centrata automaticamente all'avvio (`CenterScreen`).
+- Su macOS, la finestra applica esplicitamente l'icona da PNG per migliorare la visualizzazione nel runtime desktop.
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
 - In chiusura app, se il polling e' attivo viene forzata la procedura di `Stop` prima dell'uscita.
 - In build `Debug`, all'avvio vengono caricati automaticamente 5 record demo nella griglia.
@@ -118,4 +119,6 @@ MySQLClientShow.App/
   Configuration/AppConfiguration.cs
   Utilities/SqlQueryFormatter.cs
   Assets/mysql-client-show.ico
+  Assets/mysql-client-show.icns
+  Assets/mysql-client-show.png
 ```

@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
 using MySQLClientShow.App.Models;
@@ -20,12 +21,31 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        if (OperatingSystem.IsMacOS())
+        {
+            TrySetMacWindowIcon();
+        }
+
         Closing += OnClosing;
     }
 
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+
+    private void TrySetMacWindowIcon()
+    {
+        try
+        {
+            using var iconStream = AssetLoader.Open(new Uri("avares://MySQLClientShow.App/Assets/mysql-client-show.png"));
+            Icon = new WindowIcon(iconStream);
+        }
+        catch
+        {
+            // Best effort icon load on macOS.
+        }
     }
 
     private async void OnLogDataGridDoubleTapped(object? sender, TappedEventArgs e)

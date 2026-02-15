@@ -80,11 +80,11 @@ Implementato e compilabile.
 Componenti principali:
 - `README.md`: documentazione GitHub (overview, setup, uso, configurazione JSON, note operative).
 - `.gitignore`: esclusione artefatti di build (`bin/`, `obj/`) dal versionamento.
-- `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` e inclusione risorse `Assets`.
+- `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` (Windows), `UseAppHost` e inclusione risorse `Assets`.
 - `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
 - `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`, `Copia query in clipboard`).
-- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard.
+- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard; su macOS imposta l'icona finestra via asset PNG in best effort.
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml`: finestra dedicata al dettaglio query (timestamp, client, SQL) con area testo read-only e scrollbar.
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml.cs`: code-behind finestra dettaglio, apertura modal, copia SQL negli appunti, chiusura.
 - `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), ordinamento default griglia per timestamp decrescente, buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown; in build `DEBUG` pre-carica 5 record demo all'avvio.
@@ -94,6 +94,7 @@ Componenti principali:
 - `MySQLClientShow.App/Models/GeneralLogEntry.cs`: DTO righe log.
 - `MySQLClientShow.App/Configuration/AppConfiguration.cs`: modello serializzabile della configurazione.
 - `MySQLClientShow.App/Assets/mysql-client-show.ico`: icona applicativa principale (EXE + finestra).
+- `MySQLClientShow.App/Assets/mysql-client-show.icns`: icona macOS disponibile per packaging/app bundle.
 - `MySQLClientShow.App/Assets/mysql-client-show.png`: sorgente raster usata per generare l'icona.
 
 Vincoli polling implementati:
