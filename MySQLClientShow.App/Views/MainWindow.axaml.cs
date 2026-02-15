@@ -47,23 +47,27 @@ public partial class MainWindow : Window
 
     private async void OnOpenQueryDetailFromContextMenuClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is not MenuItem menuItem)
+        if (ResolveContextMenuEntry(sender) is not GeneralLogEntry selectedEntry)
         {
             return;
         }
 
-        var contextMenu = menuItem.FindAncestorOfType<ContextMenu>();
-        if (contextMenu?.PlacementTarget is DataGridRow row &&
-            row.DataContext is GeneralLogEntry rowEntry)
+        await OpenQueryDetailAsync(selectedEntry);
+    }
+
+    private async void OnCopyQueryToClipboardFromContextMenuClick(object? sender, RoutedEventArgs e)
+    {
+        if (ResolveContextMenuEntry(sender) is not GeneralLogEntry selectedEntry ||
+            Clipboard is null)
         {
-            await OpenQueryDetailAsync(rowEntry);
             return;
         }
 
-        var logDataGrid = this.FindControl<DataGrid>("LogDataGrid");
-        if (logDataGrid?.SelectedItem is GeneralLogEntry selectedEntry)
+        await Clipboard.SetTextAsync(selectedEntry.SqlText);
+
+        if (DataContext is MainWindowViewModel viewModel)
         {
-            await OpenQueryDetailAsync(selectedEntry);
+            viewModel.NotifyStatus("Query copiata in clipboard.");
         }
     }
 
@@ -71,6 +75,22 @@ public partial class MainWindow : Window
     {
         var queryDetailWindow = new QueryDetailWindow(entry);
         await queryDetailWindow.ShowDialog(this);
+    }
+
+    private GeneralLogEntry? ResolveContextMenuEntry(object? sender)
+    {
+        if (sender is MenuItem menuItem)
+        {
+            var contextMenu = menuItem.FindAncestorOfType<ContextMenu>();
+            if (contextMenu?.PlacementTarget is DataGridRow row &&
+                row.DataContext is GeneralLogEntry rowEntry)
+            {
+                return rowEntry;
+            }
+        }
+
+        var logDataGrid = this.FindControl<DataGrid>("LogDataGrid");
+        return logDataGrid?.SelectedItem as GeneralLogEntry;
     }
 
     private async void OnExportCsvClick(object? sender, RoutedEventArgs e)

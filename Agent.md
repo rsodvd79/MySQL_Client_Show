@@ -83,8 +83,8 @@ Componenti principali:
 - `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` e inclusione risorse `Assets`.
 - `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
-- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`).
-- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query.
+- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`, `Copia query in clipboard`).
+- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard.
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml`: finestra dedicata al dettaglio query (timestamp, client, SQL) con area testo read-only e scrollbar.
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml.cs`: code-behind finestra dettaglio, apertura modal, copia SQL negli appunti, chiusura.
 - `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), ordinamento default griglia per timestamp decrescente, buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown; in build `DEBUG` pre-carica 5 record demo all'avvio.
@@ -119,6 +119,7 @@ Verifica effettuata:
    - monitorare risultati nel DataGrid
    - usare `Client filter` (dropdown auto-popolata) per filtrare `UserHost`
    - aprire dettaglio query con doppio click su riga oppure con `tasto destro` -> `Apri dettaglio query`
+   - copiare rapidamente la query con `tasto destro` -> `Copia query in clipboard`
    - nella finestra dettaglio usare `Copia SQL` per copiare la query formattata
    - premere `Stop` per disattivare `general_log` e chiudere sessione
 4. Chiusura app:

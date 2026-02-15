@@ -111,6 +111,9 @@
             <ContextMenu>
               <MenuItem Header="Apri dettaglio query"
                         Click="OnOpenQueryDetailFromContextMenuClick" />
+              <Separator />
+              <MenuItem Header="Copia query in clipboard"
+                        Click="OnCopyQueryToClipboardFromContextMenuClick" />
             </ContextMenu>
           </Setter>
         </Style>
