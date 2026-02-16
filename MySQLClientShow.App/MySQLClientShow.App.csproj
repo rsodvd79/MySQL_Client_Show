@@ -26,4 +26,74 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
+
+  <Target Name="CreateMacAppBundleAfterBuild"
+          AfterTargets="Build"
+          Condition="$([MSBuild]::IsOSPlatform('OSX')) and '$(DesignTimeBuild)' != 'true' and '$(IsCrossTargetingBuild)' != 'true'">
+    <PropertyGroup>
+      <_MacBundleDir>$(TargetDir)$(AssemblyName).app</_MacBundleDir>
+      <_MacBundleContentsDir>$(_MacBundleDir)/Contents</_MacBundleContentsDir>
+      <_MacBundleMacOSDir>$(_MacBundleContentsDir)/MacOS</_MacBundleMacOSDir>
+      <_MacBundleResourcesDir>$(_MacBundleContentsDir)/Resources</_MacBundleResourcesDir>
+      <_MacBundleIconFileName>mysql-client-show.icns</_MacBundleIconFileName>
+      <_MacBundleIdentifier>com.daviderosa.mysqlclientshow</_MacBundleIdentifier>
+    </PropertyGroup>
+
+    <RemoveDir Directories="$(_MacBundleDir)"
+               Condition="Exists('$(_MacBundleDir)')" />
+    <MakeDir Directories="$(_MacBundleMacOSDir);$(_MacBundleResourcesDir)" />
+
+    <ItemGroup>
+      <_MacBundleSourceFiles Include="$(TargetDir)**/*"
+                             Exclude="$(_MacBundleDir)/**" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_MacBundleSourceFiles)"
+          DestinationFiles="@(_MacBundleSourceFiles->'$(_MacBundleMacOSDir)/%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
+
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/Assets/mysql-client-show.icns"
+          DestinationFiles="$(_MacBundleResourcesDir)/$(_MacBundleIconFileName)" />
+
+    <ItemGroup>
+      <_MacInfoPlistLines Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;" />
+      <_MacInfoPlistLines Include="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;https://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;" />
+      <_MacInfoPlistLines Include="&lt;plist version=&quot;1.0&quot;&gt;" />
+      <_MacInfoPlistLines Include="&lt;dict&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundleDevelopmentRegion&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;en&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundleDisplayName&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;MySQL Client Show&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundleExecutable&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;$(AssemblyName)&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundleIconFile&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;$(_MacBundleIconFileName)&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundleIdentifier&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;$(_MacBundleIdentifier)&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundleInfoDictionaryVersion&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;6.0&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundleName&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;MySQL Client Show&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundlePackageType&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;APPL&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundleShortVersionString&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;$(AssemblyVersion)&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;CFBundleVersion&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;$(FileVersion)&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;LSMinimumSystemVersion&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;string&gt;10.13&lt;/string&gt;" />
+      <_MacInfoPlistLines Include="  &lt;key&gt;NSHighResolutionCapable&lt;/key&gt;" />
+      <_MacInfoPlistLines Include="  &lt;true/&gt;" />
+      <_MacInfoPlistLines Include="&lt;/dict&gt;" />
+      <_MacInfoPlistLines Include="&lt;/plist&gt;" />
+    </ItemGroup>
+
+    <WriteLinesToFile File="$(_MacBundleContentsDir)/Info.plist"
+                      Lines="@(_MacInfoPlistLines)"
+                      Overwrite="true"
+                      Encoding="UTF-8" />
+
+    <Exec Command="chmod +x &quot;$(_MacBundleMacOSDir)/$(AssemblyName)&quot;"
+          Condition="Exists('$(_MacBundleMacOSDir)/$(AssemblyName)')" />
+  </Target>
 </Project>

@@ -40,6 +40,8 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Se la dimensione iniziale della finestra supera lo schermo corrente, la finestra viene massimizzata automaticamente all'avvio.
 - Se la connessione MySQL cade durante il monitoraggio, il polling non si ferma: l'app tenta la riconnessione automatica ogni 2 secondi.
 - Su macOS, la finestra applica esplicitamente l'icona da PNG per migliorare la visualizzazione nel runtime desktop.
+- Su macOS, l'icona Dock viene impostata esplicitamente a runtime dal PNG applicativo (best effort) per evitare l'icona vuota.
+- Su macOS, dopo la build viene generato automaticamente anche il bundle `MySQLClientShow.App.app` con `Info.plist` e icona `.icns` per evitare icona vuota in Finder.
 - Su macOS, il menu applicazione nella barra dei menu usa il nome `MySQL Client Show` invece del fallback `Avalonia`.
 - Su macOS, la voce di default `About Avalonia` e' rimossa; la chiusura resta disponibile in `File -> Quit MySQL Client Show`.
 - Su macOS, il menu applicazione (prima voce, con nome app) viene impostato esplicitamente senza voci di default Avalonia.
@@ -70,6 +72,10 @@ dotnet restore
 dotnet build MySQLClientShow.sln
 dotnet run --project MySQLClientShow.App
 ```
+
+Su macOS, dopo `dotnet build`, il bundle applicativo e' disponibile in:
+
+`MySQLClientShow.App/bin/Debug/net8.0/MySQLClientShow.App.app`
 
 ## Utilizzo
 1. Inserisci la connection string.

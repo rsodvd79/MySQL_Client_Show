@@ -64,6 +64,10 @@
             <TextBlock TextWrapping="Wrap"
                        Text="- Su macOS, il menu File include anche Start, Stop, Clear, Export CSV e Help / Aiuto (?) come alternative ai pulsanti toolbar." />
             <TextBlock TextWrapping="Wrap"
+                       Text="- Su macOS, l'icona Dock viene impostata esplicitamente dal PNG applicativo per evitare un'icona vuota in esecuzione da IDE." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Su macOS, dopo la build viene generato automaticamente un bundle .app con Info.plist e icona .icns per mostrare correttamente l'icona in Finder." />
+            <TextBlock TextWrapping="Wrap"
                        Text="- Il polling e configurabile tra 200 e 60000 ms." />
             <TextBlock TextWrapping="Wrap"
                        Text="- La griglia e scrollabile; il buffer mantiene al massimo 5000 query. Oltre il limite, le piu vecchie vengono scartate automaticamente." />
@@ -116,6 +120,10 @@
                        Text="- On macOS, the default About Avalonia menu item is removed; the application menu does not use Avalonia default entries and exit remains under File -> Quit MySQL Client Show, without duplicating the MySQL Client Show menu entry." />
             <TextBlock TextWrapping="Wrap"
                        Text="- On macOS, the File menu also includes Start, Stop, Clear, Export CSV, and Help / Aiuto (?) as alternatives to toolbar buttons." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- On macOS, the Dock icon is explicitly set from the application PNG to avoid a blank icon when running from IDE." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- On macOS, after build an .app bundle is automatically generated with Info.plist and .icns icon so Finder shows the correct application icon." />
             <TextBlock TextWrapping="Wrap"
                        Text="- Polling interval is configurable from 200 to 60000 ms." />
             <TextBlock TextWrapping="Wrap"
