@@ -19,7 +19,7 @@
 
     <Grid Grid.Row="1"
           Margin="0,12,0,12"
-          RowDefinitions="Auto,Auto"
+          RowDefinitions="Auto,Auto,Auto"
           ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto">
       <TextBlock Grid.Row="0"
                  Grid.Column="0"
@@ -93,6 +93,19 @@
                  Margin="0,10,0,0"
                  VerticalAlignment="Center"
                  Text="Range: 200-60000" />
+
+      <TextBlock Grid.Row="2"
+                 Grid.Column="0"
+                 Margin="0,10,10,0"
+                 VerticalAlignment="Center"
+                 Text="Query search" />
+
+      <TextBox Grid.Row="2"
+               Grid.Column="1"
+               Grid.ColumnSpan="5"
+               Margin="0,10,0,0"
+               Watermark="Ricerca parziale nel testo SQL (es. select, orders, where id)"
+               Text="{Binding QuerySearchFilter, Mode=TwoWay}" />
     </Grid>
 
     <DataGrid x:Name="LogDataGrid"

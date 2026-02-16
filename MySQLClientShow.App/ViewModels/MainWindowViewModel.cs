@@ -24,6 +24,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
 
     private string _connectionString = string.Empty;
     private string _selectedClientFilter = AllClientsFilterOption;
+    private string _querySearchFilter = string.Empty;
     private string _statusMessage = "Pronto. Inserisci la connection string.";
     private int _pollingIntervalMs = DefaultPollingIntervalMs;
     private bool _isRunning;
@@ -89,6 +90,19 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         }
     }
 
+    public string QuerySearchFilter
+    {
+        get => _querySearchFilter;
+        set
+        {
+            var normalizedValue = NormalizeQuerySearchFilter(value);
+            if (SetProperty(ref _querySearchFilter, normalizedValue))
+            {
+                ApplyClientFilter();
+            }
+        }
+    }
+
     public string StatusMessage
     {
         get => _statusMessage;
@@ -144,6 +158,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     {
         ConnectionString = configuration.ConnectionString ?? string.Empty;
         ClientFilter = configuration.ClientFilter ?? string.Empty;
+        QuerySearchFilter = configuration.QuerySearchFilter ?? string.Empty;
         PollingIntervalMs = configuration.PollingIntervalMs;
     }
 
@@ -153,6 +168,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         {
             ConnectionString = ConnectionString,
             ClientFilter = ClientFilter,
+            QuerySearchFilter = QuerySearchFilter,
             PollingIntervalMs = PollingIntervalMs
         };
     }
@@ -412,12 +428,22 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
 
         var selectedFilter = SelectedClientFilter;
         var includeAll = string.Equals(selectedFilter, AllClientsFilterOption, StringComparison.Ordinal);
+        var querySearchFilter = QuerySearchFilter;
+        var hasQuerySearchFilter = !string.IsNullOrWhiteSpace(querySearchFilter);
         var matchingEntries = new List<GeneralLogEntry>();
 
         foreach (var entry in _allEntries)
         {
-            if (includeAll ||
-                string.Equals(entry.UserHost, selectedFilter, StringComparison.OrdinalIgnoreCase))
+            var matchesClient = includeAll ||
+                                string.Equals(entry.UserHost, selectedFilter, StringComparison.OrdinalIgnoreCase);
+            if (!matchesClient)
+            {
+                continue;
+            }
+
+            var matchesQuery = !hasQuerySearchFilter ||
+                               entry.SqlText.Contains(querySearchFilter, StringComparison.OrdinalIgnoreCase);
+            if (matchesQuery)
             {
                 matchingEntries.Add(entry);
             }
@@ -471,6 +497,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     private static string NormalizeClientFilterOption(string? option)
     {
         return string.IsNullOrWhiteSpace(option) ? AllClientsFilterOption : option.Trim();
+    }
+
+    private static string NormalizeQuerySearchFilter(string? filter)
+    {
+        return string.IsNullOrWhiteSpace(filter) ? string.Empty : filter.Trim();
     }
 
     private void EnsureClientFilterOption(string? option)

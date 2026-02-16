@@ -14,6 +14,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
   - Min: `200`
   - Max: `60000`
 - Filtro client tramite dropdown (`user_host`) con popolamento dinamico dai dati di polling.
+- Ricerca parziale nel testo SQL tramite campo `Query search` (case-insensitive).
 - Griglia risultati con timestamp, user host, SQL.
 - Ordinamento di default griglia: `Timestamp` decrescente (record piu recenti in alto).
 - Apertura dettaglio query SQL:
@@ -58,12 +59,13 @@ dotnet run --project MySQLClientShow.App
 2. Imposta il polling (default `1000 ms`).
 3. Premi `Start`.
 4. Seleziona un client dalla dropdown `Client filter` (opzionale, lista aggiornata automaticamente quando arrivano nuovi client).
-5. Apri il dettaglio SQL di una riga con doppio click oppure con `tasto destro` -> `Apri dettaglio query`.
-6. In alternativa copia al volo la query con `tasto destro` -> `Copia query in clipboard`.
-7. Nella finestra dettaglio usa `Copia SQL` per copiare la query formattata.
-8. Premi `Export CSV` per salvare i dati attualmente visibili in griglia (stesso filtro/sort).
-9. Premi `Stop` per fermare il monitoraggio e disattivare `general_log`.
-10. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
+5. Usa `Query search` per filtrare in modo parziale il contenuto della colonna SQL.
+6. Apri il dettaglio SQL di una riga con doppio click oppure con `tasto destro` -> `Apri dettaglio query`.
+7. In alternativa copia al volo la query con `tasto destro` -> `Copia query in clipboard`.
+8. Nella finestra dettaglio usa `Copia SQL` per copiare la query formattata.
+9. Premi `Export CSV` per salvare i dati attualmente visibili in griglia (stesso filtro/sort).
+10. Premi `Stop` per fermare il monitoraggio e disattivare `general_log`.
+11. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
 
 ## Configurazione JSON
 La configurazione utente viene persistita in:
@@ -73,6 +75,7 @@ La configurazione utente viene persistita in:
 Campi salvati:
 - `ConnectionString`
 - `ClientFilter`
+- `QuerySearchFilter`
 - `PollingIntervalMs`
 
 Esempio:
@@ -80,6 +83,7 @@ Esempio:
 {
   "ConnectionString": "Server=127.0.0.1;Port=3306;User ID=root;Password=***;Database=mysql;",
   "ClientFilter": "app_user@10.0.",
+  "QuerySearchFilter": "orders",
   "PollingIntervalMs": 1000
 }
 ```

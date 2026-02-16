@@ -6,5 +6,7 @@ public sealed class AppConfiguration
 
     public string ClientFilter { get; set; } = string.Empty;
 
+    public string QuerySearchFilter { get; set; } = string.Empty;
+
     public int PollingIntervalMs { get; set; } = 1000;
 }

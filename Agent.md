@@ -1,7 +1,7 @@
 # AGENT.md — MySQL Client Show (Windows / C# .NET / Avalonia)
 
 ## Obiettivo
-Realizzare un'app Windows (desktop) in **C# .NET** con **UI Avalonia** che si colleghi a un server **MySQL** e consenta di monitorare le query eseguite dai client leggendo `mysql.general_log` (log su TABLE) in polling, accodando i risultati in memoria e visualizzandoli in una griglia con filtri.
+Realizzare un'app Windows (desktop) in **C# .NET** con **UI Avalonia** che si colleghi a un server **MySQL** e consenta di monitorare le query eseguite dai client leggendo `mysql.general_log` (log su TABLE) in polling, accodando i risultati in memoria e visualizzandoli in una griglia con filtri (client e ricerca parziale SQL).
 
 ---
 
@@ -22,11 +22,12 @@ Schermata principale con:
 2. **Button**: `Start` -> attiva general log su TABLE e avvia polling
 3. **Button**: `Stop` -> spegne general log e ferma polling
 4. **Dropdown**: `Client filter`
-5. **Numeric input**: `Polling interval (ms)` con default `1000`
-6. **DataGrid**: risultati (Timestamp, SQL, UserHost)
+5. **TextBox**: `Query search` (ricerca parziale nel testo SQL)
+6. **Numeric input**: `Polling interval (ms)` con default `1000`
+7. **DataGrid**: risultati (Timestamp, SQL, UserHost)
    - ordinamento di default: `Timestamp` decrescente
-7. **Status bar**: stato e conteggi
-8. **Icona applicativa** coerente con il dominio MySQL/query monitor
+8. **Status bar**: stato e conteggi
+9. **Icona applicativa** coerente con il dominio MySQL/query monitor
 
 ---
 
@@ -54,6 +55,7 @@ Schermata principale con:
 - Campi persistiti:
   - `ConnectionString`
   - `ClientFilter`
+  - `QuerySearchFilter`
   - `PollingIntervalMs`
 
 ---
@@ -74,7 +76,7 @@ ORDER BY event_time ASC;
 
 ---
 
-## Stato implementazione (aggiornato al 2026-02-15)
+## Stato implementazione (aggiornato al 2026-02-16)
 Implementato e compilabile.
 
 Componenti principali:
@@ -83,11 +85,11 @@ Componenti principali:
 - `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` (Windows), `UseAppHost` e inclusione risorse `Assets`.
 - `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
-- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`, `Copia query in clipboard`).
+- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, campo `Query search` per ricerca parziale nel testo SQL, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`, `Copia query in clipboard`).
 - `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard; su macOS imposta l'icona finestra via asset PNG in best effort.
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml`: finestra dedicata al dettaglio query (timestamp, client, SQL) con area testo read-only e scrollbar.
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml.cs`: code-behind finestra dettaglio, apertura modal, copia SQL negli appunti, chiusura.
-- `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), ordinamento default griglia per timestamp decrescente, buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown; in build `DEBUG` pre-carica 5 record demo all'avvio.
+- `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), filtro query testuale parziale case-insensitive (`Contains` su `SqlText`), ordinamento default griglia per timestamp decrescente, buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown; in build `DEBUG` pre-carica 5 record demo all'avvio.
 - `MySQLClientShow.App/Utilities/SqlQueryFormatter.cs`: formatter SQL leggero per visualizzare query multi-linea in modo leggibile nella finestra di dettaglio.
 - `MySQLClientShow.App/Services/MySqlGeneralLogService.cs`: connessione MySQL, enable/disable general log, query su `mysql.general_log`.
 - `MySQLClientShow.App/Services/JsonAppConfigurationStore.cs`: lettura/scrittura configurazione JSON.
@@ -119,13 +121,14 @@ Verifica effettuata:
    - premere `Start`
    - monitorare risultati nel DataGrid
    - usare `Client filter` (dropdown auto-popolata) per filtrare `UserHost`
+   - usare `Query search` per ricerca parziale nel testo SQL (case-insensitive)
    - aprire dettaglio query con doppio click su riga oppure con `tasto destro` -> `Apri dettaglio query`
    - copiare rapidamente la query con `tasto destro` -> `Copia query in clipboard`
    - nella finestra dettaglio usare `Copia SQL` per copiare la query formattata
    - premere `Stop` per disattivare `general_log` e chiudere sessione
 4. Chiusura app:
    - se il polling e' attivo viene eseguito automaticamente `Stop`
-   - la configurazione corrente (`ConnectionString`, `ClientFilter`, `PollingIntervalMs`) viene salvata automaticamente su JSON
+   - la configurazione corrente (`ConnectionString`, `ClientFilter`, `QuerySearchFilter`, `PollingIntervalMs`) viene salvata automaticamente su JSON
 
 ---
 
