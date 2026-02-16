@@ -9,6 +9,7 @@ public sealed class MySqlGeneralLogService : IAsyncDisposable
     private const string EnableLogOutputSql = "SET GLOBAL log_output = 'TABLE';";
     private const string EnableGeneralLogSql = "SET GLOBAL general_log = 'ON';";
     private const string DisableGeneralLogSql = "SET GLOBAL general_log = 'OFF';";
+    private const string TruncateGeneralLogSql = "TRUNCATE TABLE mysql.general_log;";
     private const string ReadServerNowSql = "SELECT CURRENT_TIMESTAMP(6);";
 
     private const string ReadGeneralLogSql = """
@@ -131,6 +132,7 @@ public sealed class MySqlGeneralLogService : IAsyncDisposable
         try
         {
             await ExecuteNonQueryAsync(_connection, DisableGeneralLogSql, cancellationToken).ConfigureAwait(false);
+            await ExecuteNonQueryAsync(_connection, TruncateGeneralLogSql, cancellationToken).ConfigureAwait(false);
         }
         catch
         {

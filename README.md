@@ -10,6 +10,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Avvio/arresto monitoraggio con gestione automatica di:
   - `SET GLOBAL log_output = 'TABLE';`
   - `SET GLOBAL general_log = 'ON'/'OFF';`
+  - in `Stop`: `TRUNCATE TABLE mysql.general_log;`
 - Polling configurabile (`Polling interval (ms)`) con vincoli:
   - Default: `1000`
   - Min: `200`
@@ -52,6 +53,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Accesso a un server MySQL/MariaDB con privilegi per:
   - `SET GLOBAL`
   - lettura `mysql.general_log`
+  - `TRUNCATE TABLE mysql.general_log`
 
 ## Avvio rapido
 ```bash
@@ -72,7 +74,7 @@ dotnet run --project MySQLClientShow.App
 9. Nella finestra dettaglio usa `Copia SQL` per copiare la query formattata.
 10. Premi `Export CSV` per salvare i dati attualmente visibili in griglia (stesso filtro/sort).
 11. Premi `Clear` per svuotare i dati e ripulire la lista `Client filter`.
-12. Premi `Stop` per fermare il monitoraggio e disattivare `general_log`.
+12. Premi `Stop` per fermare il monitoraggio, disattivare `general_log` e svuotare `mysql.general_log`.
 13. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
 
 ## Configurazione JSON
@@ -112,6 +114,7 @@ ORDER BY event_time ASC;
 
 ## Note importanti
 - `general_log` puo avere impatto sulle performance: usare con criterio, specialmente su ambienti di produzione.
+- In `Stop`, la tabella `mysql.general_log` viene svuotata con `TRUNCATE TABLE mysql.general_log;`.
 - La connection string e salvata in chiaro nel file JSON locale: proteggi il profilo utente/machine.
 - I record demo sono presenti solo in modalita `Debug` e vengono azzerati quando premi `Start` (reset buffer).
 - In caso di errori di autenticazione/handshake, lo stato mostra suggerimenti (es. host autorizzato, `AllowPublicKeyRetrieval=True`, SSL).

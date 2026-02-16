@@ -28,7 +28,7 @@
             <TextBlock TextWrapping="Wrap"
                        Text="MySQL Client Show monitora in tempo reale le query lette da mysql.general_log." />
             <TextBlock TextWrapping="Wrap"
-                       Text="Flusso base: inserisci la connection string, premi Start, osserva i risultati in griglia e premi Stop per fermare." />
+                       Text="Flusso base: inserisci la connection string, premi Start, osserva i risultati in griglia e premi Stop per fermare e svuotare il log tabellare." />
 
             <TextBlock Margin="0,8,0,0"
                        Text="Filtri"
@@ -48,9 +48,9 @@
                        FontSize="18"
                        FontWeight="SemiBold" />
             <TextBlock TextWrapping="Wrap"
-                       Text="- L'app abilita/disabilita general_log automaticamente in Start/Stop." />
+                       Text="- L'app abilita general_log in Start; in Stop disabilita general_log e svuota mysql.general_log (TRUNCATE)." />
             <TextBlock TextWrapping="Wrap"
-                       Text="- Servono permessi MySQL per SET GLOBAL e lettura mysql.general_log." />
+                       Text="- Servono permessi MySQL per SET GLOBAL, lettura mysql.general_log e TRUNCATE TABLE mysql.general_log." />
             <TextBlock TextWrapping="Wrap"
                        Text="- Il polling e configurabile tra 200 e 60000 ms." />
             <TextBlock TextWrapping="Wrap"
@@ -69,7 +69,7 @@
             <TextBlock TextWrapping="Wrap"
                        Text="MySQL Client Show monitors queries in real time from mysql.general_log." />
             <TextBlock TextWrapping="Wrap"
-                       Text="Basic flow: set the connection string, click Start, inspect grid rows, click Stop to end monitoring." />
+                       Text="Basic flow: set the connection string, click Start, inspect grid rows, then click Stop to end monitoring and clear the table log." />
 
             <TextBlock Margin="0,8,0,0"
                        Text="Filters"
@@ -89,9 +89,9 @@
                        FontSize="18"
                        FontWeight="SemiBold" />
             <TextBlock TextWrapping="Wrap"
-                       Text="- The app enables/disables general_log automatically during Start/Stop." />
+                       Text="- The app enables general_log on Start; on Stop it disables general_log and clears mysql.general_log (TRUNCATE)." />
             <TextBlock TextWrapping="Wrap"
-                       Text="- MySQL privileges are required for SET GLOBAL and mysql.general_log read access." />
+                       Text="- MySQL privileges are required for SET GLOBAL, mysql.general_log read access, and TRUNCATE TABLE mysql.general_log." />
             <TextBlock TextWrapping="Wrap"
                        Text="- Polling interval is configurable from 200 to 60000 ms." />
             <TextBlock TextWrapping="Wrap"

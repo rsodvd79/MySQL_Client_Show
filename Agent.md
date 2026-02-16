@@ -20,7 +20,7 @@ Realizzare un'app Windows (desktop) in **C# .NET** con **UI Avalonia** che si co
 Schermata principale con:
 1. **TextBox**: `Connection string`
 2. **Button**: `Start` -> attiva general log su TABLE e avvia polling
-3. **Button**: `Stop` -> spegne general log e ferma polling
+3. **Button**: `Stop` -> spegne general log, svuota `mysql.general_log` e ferma polling
 4. **Dropdown**: `Client filter`
 5. **TextBox**: `Query search` (ricerca parziale nel testo SQL)
 6. **Numeric input**: `Polling interval (ms)` con default `1000`
@@ -41,6 +41,7 @@ Schermata principale con:
    - avvia un loop di polling che legge `mysql.general_log`
 3. Premendo **Stop**:
    - esegue `SET GLOBAL general_log = 'OFF';`
+   - esegue `TRUNCATE TABLE mysql.general_log;`
    - ferma il polling e chiude la connessione
 4. In uscita applicazione:
    - se il polling e' attivo, viene imposta la procedura di stop prima della chiusura
@@ -93,7 +94,7 @@ Componenti principali:
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml.cs`: code-behind finestra dettaglio, apertura modal, copia SQL negli appunti, chiusura.
 - `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), filtro query testuale parziale case-insensitive (`Contains` su `SqlText`) con supporto multi-termine separato da `|` (match OR), ordinamento default griglia per timestamp decrescente, buffer in memoria scorrevole con cap a 5000 righe (oltre il limite elimina le piu vecchie), deduplica, import/export configurazione, update UI non bloccanti in shutdown; in build `DEBUG` pre-carica 5 record demo all'avvio; migliorata la diagnostica errori avvio polling con messaggi piu espliciti su autenticazione/handshake; i nuovi eventi non coerenti con i filtri attivi vengono scartati in ingresso e non bufferizzati; il comando `Clear` svuota anche la lista `Client filter` riportandola a `(Tutti i client)`.
 - `MySQLClientShow.App/Utilities/SqlQueryFormatter.cs`: formatter SQL leggero per visualizzare query multi-linea in modo leggibile nella finestra di dettaglio.
-- `MySQLClientShow.App/Services/MySqlGeneralLogService.cs`: connessione MySQL, enable/disable general log, query su `mysql.general_log`, normalizzazione connection string (trim virgolette esterne), lettura timestamp server (`CURRENT_TIMESTAMP(6)`).
+- `MySQLClientShow.App/Services/MySqlGeneralLogService.cs`: connessione MySQL, enable/disable general log, `TRUNCATE TABLE mysql.general_log` in stop, query su `mysql.general_log`, normalizzazione connection string (trim virgolette esterne), lettura timestamp server (`CURRENT_TIMESTAMP(6)`).
 - `MySQLClientShow.App/Services/JsonAppConfigurationStore.cs`: lettura/scrittura configurazione JSON.
 - `MySQLClientShow.App/Models/GeneralLogEntry.cs`: DTO righe log.
 - `MySQLClientShow.App/Configuration/AppConfiguration.cs`: modello serializzabile della configurazione.
@@ -129,7 +130,7 @@ Verifica effettuata:
    - copiare rapidamente la query con `tasto destro` -> `Copia query in clipboard`
    - aprire l'help bilingue con il pulsante `?`
    - nella finestra dettaglio usare `Copia SQL` per copiare la query formattata
-   - premere `Stop` per disattivare `general_log` e chiudere sessione
+   - premere `Stop` per disattivare `general_log`, svuotare `mysql.general_log` e chiudere sessione
 4. Chiusura app:
    - se il polling e' attivo viene eseguito automaticamente `Stop`
    - la configurazione corrente (`ConnectionString`, `ClientFilter`, `QuerySearchFilter`, `PollingIntervalMs`) viene salvata automaticamente su JSON
@@ -140,6 +141,7 @@ Verifica effettuata:
 - Utente con privilegi per eseguire `SET GLOBAL`.
 - `log_output = TABLE` consentito.
 - Accesso al database `mysql` e alla tabella `mysql.general_log`.
+- Privilegio per eseguire `TRUNCATE TABLE mysql.general_log`.
 
 ---
 
