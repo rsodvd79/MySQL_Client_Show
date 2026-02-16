@@ -1,4 +1,4 @@
-# AGENT.md — MySQL Client Show (Windows / C# .NET / Avalonia)
+# AGENTS.md — MySQL Client Show (Windows / C# .NET / Avalonia)
 
 ## Obiettivo
 Realizzare un'app Windows (desktop) in **C# .NET** con **UI Avalonia** che si colleghi a un server **MySQL** e consenta di monitorare le query eseguite dai client leggendo `mysql.general_log` (log su TABLE) in polling, accodando i risultati in memoria e visualizzandoli in una griglia con filtri (client e ricerca parziale SQL).
@@ -151,7 +151,7 @@ Verifica effettuata:
 ---
 
 ## Regola di manutenzione documento
-Da questo momento `AGENT.md` deve essere aggiornato a ogni modifica funzionale o architetturale.
+Da questo momento `AGENTS.md` deve essere aggiornato a ogni modifica funzionale o architetturale.
 
 Checklist minima da aggiornare ogni volta:
 1. **Stato implementazione** (cosa e' stato aggiunto/modificato)
