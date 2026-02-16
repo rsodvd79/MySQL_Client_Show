@@ -139,6 +139,16 @@ public sealed class MySqlGeneralLogService : IAsyncDisposable
             // Best effort during shutdown.
         }
 
+        await DisconnectAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task DisconnectAsync(CancellationToken cancellationToken)
+    {
+        if (_connection is null)
+        {
+            return;
+        }
+
         try
         {
             await _connection.CloseAsync().ConfigureAwait(false);

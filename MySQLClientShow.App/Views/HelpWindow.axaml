@@ -54,6 +54,8 @@
             <TextBlock TextWrapping="Wrap"
                        Text="- Dopo 1 ora di monitoraggio continuo, la barra di stato mostra un avviso che segnala la crescita di mysql.general_log." />
             <TextBlock TextWrapping="Wrap"
+                       Text="- Se la connessione MySQL si interrompe, il polling resta attivo e prova la riconnessione automatica ogni 2 secondi." />
+            <TextBlock TextWrapping="Wrap"
                        Text="- Il titolo finestra mostra la versione del programma (es. v2026.2.16.1308)." />
             <TextBlock TextWrapping="Wrap"
                        Text="- Se la dimensione iniziale supera lo schermo disponibile, la finestra principale viene massimizzata automaticamente all'avvio." />
@@ -100,6 +102,8 @@
                        Text="- MySQL privileges are required for SET GLOBAL, mysql.general_log read access, and TRUNCATE TABLE mysql.general_log." />
             <TextBlock TextWrapping="Wrap"
                        Text="- After 1 hour of continuous monitoring, the status bar shows a warning that mysql.general_log is growing." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- If the MySQL connection drops, polling stays active and retries automatic reconnection every 2 seconds." />
             <TextBlock TextWrapping="Wrap"
                        Text="- The window title shows the program version (for example v2026.2.16.1308)." />
             <TextBlock TextWrapping="Wrap"

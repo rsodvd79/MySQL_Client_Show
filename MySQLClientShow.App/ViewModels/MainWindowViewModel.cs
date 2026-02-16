@@ -14,6 +14,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     public const int MaxPollingIntervalMs = 60000;
     private const string AllClientsFilterOption = "(Tutti i client)";
     private static readonly TimeSpan LogGrowthWarningDelay = TimeSpan.FromHours(1);
+    private static readonly TimeSpan ReconnectRetryDelay = TimeSpan.FromSeconds(2);
     private const string LongRunningMonitorWarningMessage =
         "Avviso: monitoraggio attivo da oltre 1 ora. La tabella mysql.general_log sta crescendo.";
 
@@ -276,31 +277,60 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         var finalStatus = "Monitoraggio fermo.";
         var hasError = false;
         var fromTime = DateTime.MinValue;
+        var hasConnectedAtLeastOnce = false;
 
         try
         {
-            await _service.ConnectAndEnableAsync(connectionString, cancellationToken).ConfigureAwait(false);
-            fromTime = await _service.ReadServerCurrentTimestampAsync(cancellationToken).ConfigureAwait(false);
-            RunOnUiThread(() =>
-                StatusMessage = $"Monitoraggio attivo. Polling: {PollingIntervalMs} ms.");
-
             while (!cancellationToken.IsCancellationRequested)
             {
-                var rows = await _service.ReadEntriesAsync(fromTime, "%", cancellationToken).ConfigureAwait(false);
-
-                if (rows.Count > 0)
+                try
                 {
-                    fromTime = rows[^1].EventTime;
-
-                    RunOnUiThread(() =>
+                    if (!_service.IsConnected)
                     {
-                        AppendEntries(rows);
-                        StatusMessage = $"Monitoraggio attivo. Ultimo evento: {fromTime:yyyy-MM-dd HH:mm:ss.ffffff}";
-                    });
-                }
+                        await _service.ConnectAndEnableAsync(connectionString, cancellationToken).ConfigureAwait(false);
 
-                var pollingDelay = TimeSpan.FromMilliseconds(PollingIntervalMs);
-                await Task.Delay(pollingDelay, cancellationToken).ConfigureAwait(false);
+                        if (!hasConnectedAtLeastOnce)
+                        {
+                            fromTime = await _service.ReadServerCurrentTimestampAsync(cancellationToken).ConfigureAwait(false);
+                            hasConnectedAtLeastOnce = true;
+                            RunOnUiThread(() =>
+                                StatusMessage = $"Monitoraggio attivo. Polling: {PollingIntervalMs} ms.");
+                        }
+                        else
+                        {
+                            RunOnUiThread(() =>
+                                StatusMessage = $"Riconnesso. Monitoraggio attivo. Polling: {PollingIntervalMs} ms.");
+                        }
+                    }
+
+                    var rows = await _service.ReadEntriesAsync(fromTime, "%", cancellationToken).ConfigureAwait(false);
+
+                    if (rows.Count > 0)
+                    {
+                        fromTime = rows[^1].EventTime;
+
+                        RunOnUiThread(() =>
+                        {
+                            AppendEntries(rows);
+                            StatusMessage = $"Monitoraggio attivo. Ultimo evento: {fromTime:yyyy-MM-dd HH:mm:ss.ffffff}";
+                        });
+                    }
+
+                    var pollingDelay = TimeSpan.FromMilliseconds(PollingIntervalMs);
+                    await Task.Delay(pollingDelay, cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    await _service.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
+
+                    if (!hasConnectedAtLeastOnce)
+                    {
+                        throw;
+                    }
+
+                    RunOnUiThread(() => StatusMessage = BuildReconnectStatusMessage(ex));
+                    await Task.Delay(ReconnectRetryDelay, cancellationToken).ConfigureAwait(false);
+                }
             }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -357,6 +387,15 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         }
 
         return $"Errore monitoraggio: {message}";
+    }
+
+    private static string BuildReconnectStatusMessage(Exception ex)
+    {
+        var message = ex.InnerException is null
+            ? ex.Message
+            : $"{ex.Message} | {ex.InnerException.Message}";
+
+        return $"Connessione interrotta: {message}. Nuovo tentativo tra {ReconnectRetryDelay.TotalSeconds:0} s...";
     }
 
     private void ClearBuffer()
