@@ -40,6 +40,11 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Se la dimensione iniziale della finestra supera lo schermo corrente, la finestra viene massimizzata automaticamente all'avvio.
 - Se la connessione MySQL cade durante il monitoraggio, il polling non si ferma: l'app tenta la riconnessione automatica ogni 2 secondi.
 - Su macOS, la finestra applica esplicitamente l'icona da PNG per migliorare la visualizzazione nel runtime desktop.
+- Su macOS, il menu applicazione nella barra dei menu usa il nome `MySQL Client Show` invece del fallback `Avalonia`.
+- Su macOS, la voce di default `About Avalonia` e' rimossa; la chiusura resta disponibile in `File -> Quit MySQL Client Show`.
+- Su macOS, il menu applicazione (prima voce, con nome app) viene impostato esplicitamente senza voci di default Avalonia.
+- Su macOS, non viene aggiunto un secondo menu `MySQL Client Show` nella barra dei menu.
+- Su macOS, nel menu `File` sono disponibili anche le azioni della toolbar: `Start`, `Stop`, `Clear`, `Export CSV` e `Help / Aiuto (?)`.
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
 - In chiusura app, se il polling e' attivo viene forzata la procedura di `Stop` prima dell'uscita.
 - In build `Debug`, all'avvio vengono caricati automaticamente 5 record demo nella griglia.
@@ -80,6 +85,7 @@ dotnet run --project MySQLClientShow.App
 11. Premi `Clear` per svuotare i dati e ripulire la lista `Client filter`.
 12. Premi `Stop` per fermare il monitoraggio, disattivare `general_log` e svuotare `mysql.general_log`.
 13. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
+14. Su macOS puoi richiamare da menu `File` le stesse azioni dei pulsanti: `Start`, `Stop`, `Clear`, `Export CSV` e `Help / Aiuto (?)`.
 
 ## Diagramma finestre e funzioni
 ```mermaid

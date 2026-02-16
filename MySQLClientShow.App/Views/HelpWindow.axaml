@@ -60,6 +60,10 @@
             <TextBlock TextWrapping="Wrap"
                        Text="- Se la dimensione iniziale supera lo schermo disponibile, la finestra principale viene massimizzata automaticamente all'avvio." />
             <TextBlock TextWrapping="Wrap"
+                       Text="- Su macOS la voce di menu About Avalonia e' rimossa; il menu applicazione non usa voci di default Avalonia e la chiusura resta in File -> Quit MySQL Client Show, senza duplicazione del menu MySQL Client Show." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Su macOS, il menu File include anche Start, Stop, Clear, Export CSV e Help / Aiuto (?) come alternative ai pulsanti toolbar." />
+            <TextBlock TextWrapping="Wrap"
                        Text="- Il polling e configurabile tra 200 e 60000 ms." />
             <TextBlock TextWrapping="Wrap"
                        Text="- La griglia e scrollabile; il buffer mantiene al massimo 5000 query. Oltre il limite, le piu vecchie vengono scartate automaticamente." />
@@ -108,6 +112,10 @@
                        Text="- The window title shows the program version (for example v2026.2.16.1308)." />
             <TextBlock TextWrapping="Wrap"
                        Text="- If the initial window size exceeds the available screen area, the main window is automatically maximized on startup." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- On macOS, the default About Avalonia menu item is removed; the application menu does not use Avalonia default entries and exit remains under File -> Quit MySQL Client Show, without duplicating the MySQL Client Show menu entry." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- On macOS, the File menu also includes Start, Stop, Clear, Export CSV, and Help / Aiuto (?) as alternatives to toolbar buttons." />
             <TextBlock TextWrapping="Wrap"
                        Text="- Polling interval is configurable from 200 to 60000 ms." />
             <TextBlock TextWrapping="Wrap"

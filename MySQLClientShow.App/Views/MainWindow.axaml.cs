@@ -128,7 +128,55 @@ public partial class MainWindow : Window
         return logDataGrid?.SelectedItem as GeneralLogEntry;
     }
 
+    public async Task ExecuteStartFromMenuAsync()
+    {
+        if (DataContext is not MainWindowViewModel viewModel ||
+            !viewModel.StartCommand.CanExecute(null))
+        {
+            return;
+        }
+
+        await viewModel.StartCommand.ExecuteAsync(null);
+    }
+
+    public async Task ExecuteStopFromMenuAsync()
+    {
+        if (DataContext is not MainWindowViewModel viewModel ||
+            !viewModel.StopCommand.CanExecute(null))
+        {
+            return;
+        }
+
+        await viewModel.StopCommand.ExecuteAsync(null);
+    }
+
+    public void ExecuteClearFromMenu()
+    {
+        if (DataContext is not MainWindowViewModel viewModel ||
+            !viewModel.ClearCommand.CanExecute(null))
+        {
+            return;
+        }
+
+        viewModel.ClearCommand.Execute(null);
+    }
+
+    public Task ExecuteExportCsvFromMenuAsync()
+    {
+        return ExportCsvAsync();
+    }
+
+    public Task ExecuteHelpFromMenuAsync()
+    {
+        return ShowHelpAsync();
+    }
+
     private async void OnExportCsvClick(object? sender, RoutedEventArgs e)
+    {
+        await ExportCsvAsync();
+    }
+
+    private async Task ExportCsvAsync()
     {
         if (DataContext is not MainWindowViewModel viewModel)
         {
@@ -193,6 +241,11 @@ public partial class MainWindow : Window
     }
 
     private async void OnHelpClick(object? sender, RoutedEventArgs e)
+    {
+        await ShowHelpAsync();
+    }
+
+    private async Task ShowHelpAsync()
     {
         var helpWindow = new HelpWindow();
         await helpWindow.ShowDialog(this);
