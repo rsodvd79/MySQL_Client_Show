@@ -4,3 +4,5 @@ obj/
 **/obj/
 .vs/
 **/.vs/
+.vscode/
+**/.vscode/
