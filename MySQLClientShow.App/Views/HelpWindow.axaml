@@ -52,6 +52,10 @@
             <TextBlock TextWrapping="Wrap"
                        Text="- Servono permessi MySQL per SET GLOBAL, lettura mysql.general_log e TRUNCATE TABLE mysql.general_log." />
             <TextBlock TextWrapping="Wrap"
+                       Text="- Dopo 1 ora di monitoraggio continuo, la barra di stato mostra un avviso che segnala la crescita di mysql.general_log." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Il titolo finestra mostra la versione del programma (es. v2026.2.16.1308)." />
+            <TextBlock TextWrapping="Wrap"
                        Text="- Il polling e configurabile tra 200 e 60000 ms." />
             <TextBlock TextWrapping="Wrap"
                        Text="- La griglia e scrollabile; il buffer mantiene al massimo 5000 query. Oltre il limite, le piu vecchie vengono scartate automaticamente." />
@@ -92,6 +96,10 @@
                        Text="- The app enables general_log on Start; on Stop it disables general_log and clears mysql.general_log (TRUNCATE)." />
             <TextBlock TextWrapping="Wrap"
                        Text="- MySQL privileges are required for SET GLOBAL, mysql.general_log read access, and TRUNCATE TABLE mysql.general_log." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- After 1 hour of continuous monitoring, the status bar shows a warning that mysql.general_log is growing." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- The window title shows the program version (for example v2026.2.16.1308)." />
             <TextBlock TextWrapping="Wrap"
                        Text="- Polling interval is configurable from 200 to 60000 ms." />
             <TextBlock TextWrapping="Wrap"

@@ -158,13 +158,25 @@
             Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
             CornerRadius="6"
             Padding="8">
-      <Grid ColumnDefinitions="*,Auto,Auto">
-        <TextBlock Text="{Binding StatusMessage}" />
-        <TextBlock Grid.Column="1"
+      <Grid ColumnDefinitions="*,Auto,Auto"
+            RowDefinitions="Auto,Auto">
+        <TextBlock Grid.Row="0"
+                   Text="{Binding StatusMessage}" />
+        <TextBlock Grid.Row="1"
+                   Margin="0,4,0,0"
+                   FontWeight="SemiBold"
+                   Foreground="#B3261E"
+                   IsVisible="{Binding HasStatusWarning}"
+                   Text="{Binding StatusWarningMessage}" />
+        <TextBlock Grid.RowSpan="2"
+                   Grid.Column="1"
                    Margin="20,0,0,0"
+                   VerticalAlignment="Center"
                    Text="{Binding TotalRows, StringFormat=Totali: {0}}" />
-        <TextBlock Grid.Column="2"
+        <TextBlock Grid.RowSpan="2"
+                   Grid.Column="2"
                    Margin="20,0,0,0"
+                   VerticalAlignment="Center"
                    Text="{Binding VisibleRows, StringFormat=Visibili: {0}}" />
       </Grid>
     </Border>

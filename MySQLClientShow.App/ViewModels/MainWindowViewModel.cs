@@ -13,6 +13,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     public const int MinPollingIntervalMs = 200;
     public const int MaxPollingIntervalMs = 60000;
     private const string AllClientsFilterOption = "(Tutti i client)";
+    private static readonly TimeSpan LogGrowthWarningDelay = TimeSpan.FromHours(1);
+    private const string LongRunningMonitorWarningMessage =
+        "Avviso: monitoraggio attivo da oltre 1 ora. La tabella mysql.general_log sta crescendo.";
 
     private const int MaxEntriesInMemory = 5000;
     private const int MaxDedupeKeys = 10000;
@@ -26,6 +29,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     private string _selectedClientFilter = AllClientsFilterOption;
     private string _querySearchFilter = string.Empty;
     private string _statusMessage = "Pronto. Inserisci la connection string.";
+    private string _statusWarningMessage = string.Empty;
     private int _pollingIntervalMs = DefaultPollingIntervalMs;
     private bool _isRunning;
     private bool _isStopping;
@@ -108,6 +112,20 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         get => _statusMessage;
         private set => SetProperty(ref _statusMessage, value);
     }
+
+    public string StatusWarningMessage
+    {
+        get => _statusWarningMessage;
+        private set
+        {
+            if (SetProperty(ref _statusWarningMessage, value))
+            {
+                OnPropertyChanged(nameof(HasStatusWarning));
+            }
+        }
+    }
+
+    public bool HasStatusWarning => !string.IsNullOrWhiteSpace(StatusWarningMessage);
 
     public int PollingIntervalMs
     {
@@ -200,11 +218,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         }
 
         ResetBuffer();
+        ResetStatusWarning();
         IsRunning = true;
         StatusMessage = "Connessione al server MySQL...";
 
         _pollingCts = new CancellationTokenSource();
-        _pollingTask = Task.Run(() => RunPollingSessionAsync(ConnectionString, _pollingCts.Token));
+        var pollingToken = _pollingCts.Token;
+        _ = ScheduleLongRunningMonitorWarningAsync(pollingToken);
+        _pollingTask = Task.Run(() => RunPollingSessionAsync(ConnectionString, pollingToken));
         return Task.CompletedTask;
     }
 
@@ -308,9 +329,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
                 IsRunning = false;
                 _isStopping = false;
                 StopCommand.NotifyCanExecuteChanged();
+                ResetStatusWarning();
                 StatusMessage = hasError ? finalStatus : "Monitoraggio fermo.";
             });
 
+            _pollingCts?.Cancel();
             _pollingCts?.Dispose();
             _pollingCts = null;
             _pollingTask = null;
@@ -343,6 +366,31 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         StatusMessage = IsRunning
             ? "Buffer e filtri client svuotati. Monitoraggio attivo."
             : "Buffer e filtri client svuotati.";
+    }
+
+    private async Task ScheduleLongRunningMonitorWarningAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(LogGrowthWarningDelay, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        RunOnUiThread(() =>
+        {
+            if (IsRunning)
+            {
+                StatusWarningMessage = LongRunningMonitorWarningMessage;
+            }
+        });
     }
 
 #if DEBUG
@@ -457,6 +505,13 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         ClientFilters.Clear();
         ClientFilters.Add(AllClientsFilterOption);
         SelectedClientFilter = AllClientsFilterOption;
+        // Force a binding refresh after rebuilding ItemsSource so ComboBox reselects "(Tutti i client)".
+        OnPropertyChanged(nameof(SelectedClientFilter));
+    }
+
+    private void ResetStatusWarning()
+    {
+        StatusWarningMessage = string.Empty;
     }
 
     private void ApplyClientFilter()

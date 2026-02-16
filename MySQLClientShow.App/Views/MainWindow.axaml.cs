@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -15,12 +16,14 @@ namespace MySQLClientShow.App.Views;
 
 public partial class MainWindow : Window
 {
+    private const string WindowTitleBase = "MySQL Client Show";
     private bool _closeAfterStop;
     private bool _stopInProgress;
 
     public MainWindow()
     {
         InitializeComponent();
+        Title = BuildWindowTitle();
 
         if (OperatingSystem.IsMacOS())
         {
@@ -33,6 +36,17 @@ public partial class MainWindow : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+
+    private static string BuildWindowTitle()
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version;
+        if (version is null)
+        {
+            return WindowTitleBase;
+        }
+
+        return $"{WindowTitleBase} - v{version.ToString(4)}";
     }
 
     private void TrySetMacWindowIcon()

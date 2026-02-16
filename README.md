@@ -34,6 +34,8 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Export CSV dei dati visibili in griglia, mantenendo filtro e ordinamento correnti.
 - Pulsante `?` nella toolbar che apre una finestra Help con guida programma + filtri in Italiano e in English.
 - Stato e conteggi in footer.
+- Dopo 1 ora di monitoraggio continuo (`Start` attivo), nel footer compare un avviso: la tabella `mysql.general_log` sta crescendo.
+- Titolo finestra con versione programma evidenziata (es. `MySQL Client Show - v2026.2.16.1308`).
 - Finestra principale centrata automaticamente all'avvio (`CenterScreen`).
 - Su macOS, la finestra applica esplicitamente l'icona da PNG per migliorare la visualizzazione nel runtime desktop.
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
@@ -115,6 +117,7 @@ ORDER BY event_time ASC;
 ## Note importanti
 - `general_log` puo avere impatto sulle performance: usare con criterio, specialmente su ambienti di produzione.
 - In `Stop`, la tabella `mysql.general_log` viene svuotata con `TRUNCATE TABLE mysql.general_log;`.
+- Se il monitoraggio resta attivo oltre 1 ora, la barra di stato mostra un avviso di crescita di `mysql.general_log`.
 - La connection string e salvata in chiaro nel file JSON locale: proteggi il profilo utente/machine.
 - I record demo sono presenti solo in modalita `Debug` e vengono azzerati quando premi `Start` (reset buffer).
 - In caso di errori di autenticazione/handshake, lo stato mostra suggerimenti (es. host autorizzato, `AllowPublicKeyRetrieval=True`, SSL).
