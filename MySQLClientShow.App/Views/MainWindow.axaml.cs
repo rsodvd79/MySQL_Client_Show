@@ -177,6 +177,12 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void OnHelpClick(object? sender, RoutedEventArgs e)
+    {
+        var helpWindow = new HelpWindow();
+        await helpWindow.ShowDialog(this);
+    }
+
     private async void OnClosing(object? sender, WindowClosingEventArgs e)
     {
         if (_closeAfterStop || _stopInProgress)

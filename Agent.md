@@ -85,13 +85,15 @@ Componenti principali:
 - `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` (Windows), `UseAppHost` e inclusione risorse `Assets`.
 - `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
-- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, campo `Query search` per ricerca parziale nel testo SQL, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`, `Copia query in clipboard`).
-- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard; su macOS imposta l'icona finestra via asset PNG in best effort.
+- `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, campo `Query search` per ricerca parziale nel testo SQL, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`, `Copia query in clipboard`), pulsante `?` per Help.
+- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard; apertura finestra Help dal pulsante `?`; su macOS imposta l'icona finestra via asset PNG in best effort.
+- `MySQLClientShow.App/Views/HelpWindow.axaml`: finestra Help con contenuti bilingue Italiano/English su funzionamento generale e filtri.
+- `MySQLClientShow.App/Views/HelpWindow.axaml.cs`: code-behind della finestra Help (chiusura dialog).
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml`: finestra dedicata al dettaglio query (timestamp, client, SQL) con area testo read-only e scrollbar.
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml.cs`: code-behind finestra dettaglio, apertura modal, copia SQL negli appunti, chiusura.
-- `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), filtro query testuale parziale case-insensitive (`Contains` su `SqlText`), ordinamento default griglia per timestamp decrescente, buffer in memoria, deduplica, import/export configurazione, update UI non bloccanti in shutdown; in build `DEBUG` pre-carica 5 record demo all'avvio.
+- `MySQLClientShow.App/ViewModels/MainWindowViewModel.cs`: logica MVVM, comandi Start/Stop/Clear, polling asincrono configurabile, filtro client via dropdown (lista popolata dinamicamente dai `user_host` osservati), filtro query testuale parziale case-insensitive (`Contains` su `SqlText`) con supporto multi-termine separato da `|` (match OR), ordinamento default griglia per timestamp decrescente, buffer in memoria scorrevole con cap a 5000 righe (oltre il limite elimina le piu vecchie), deduplica, import/export configurazione, update UI non bloccanti in shutdown; in build `DEBUG` pre-carica 5 record demo all'avvio; migliorata la diagnostica errori avvio polling con messaggi piu espliciti su autenticazione/handshake; i nuovi eventi non coerenti con i filtri attivi vengono scartati in ingresso e non bufferizzati; il comando `Clear` svuota anche la lista `Client filter` riportandola a `(Tutti i client)`.
 - `MySQLClientShow.App/Utilities/SqlQueryFormatter.cs`: formatter SQL leggero per visualizzare query multi-linea in modo leggibile nella finestra di dettaglio.
-- `MySQLClientShow.App/Services/MySqlGeneralLogService.cs`: connessione MySQL, enable/disable general log, query su `mysql.general_log`.
+- `MySQLClientShow.App/Services/MySqlGeneralLogService.cs`: connessione MySQL, enable/disable general log, query su `mysql.general_log`, normalizzazione connection string (trim virgolette esterne), lettura timestamp server (`CURRENT_TIMESTAMP(6)`).
 - `MySQLClientShow.App/Services/JsonAppConfigurationStore.cs`: lettura/scrittura configurazione JSON.
 - `MySQLClientShow.App/Models/GeneralLogEntry.cs`: DTO righe log.
 - `MySQLClientShow.App/Configuration/AppConfiguration.cs`: modello serializzabile della configurazione.
@@ -104,6 +106,7 @@ Vincoli polling implementati:
 - Minimo: `200 ms`
 - Massimo: `60000 ms`
 - Comportamento: valori fuori range vengono normalizzati (clamp) nel ViewModel.
+- Allineamento temporale iniziale: il `fromTime` iniziale usa il timestamp corrente del server MySQL per ridurre mismatch timezone client/server.
 
 Verifica effettuata:
 - `dotnet build MySQLClientShow.sln` -> successo (0 errori, 0 warning).
@@ -124,6 +127,7 @@ Verifica effettuata:
    - usare `Query search` per ricerca parziale nel testo SQL (case-insensitive)
    - aprire dettaglio query con doppio click su riga oppure con `tasto destro` -> `Apri dettaglio query`
    - copiare rapidamente la query con `tasto destro` -> `Copia query in clipboard`
+   - aprire l'help bilingue con il pulsante `?`
    - nella finestra dettaglio usare `Copia SQL` per copiare la query formattata
    - premere `Stop` per disattivare `general_log` e chiudere sessione
 4. Chiusura app:
@@ -156,3 +160,12 @@ Checklist minima da aggiornare ogni volta:
 2. **Setup/Avvio rapido** (nuovi prerequisiti o comandi)
 3. **Configurazione** (nuovi campi/config file/path)
 4. **Note operative** (limiti, impatti performance, sicurezza)
+
+## Regola di manutenzione Help
+Da questo momento la finestra Help (`MySQLClientShow.App/Views/HelpWindow.axaml`) deve essere mantenuta aggiornata a ogni modifica funzionale rilevante.
+
+Checklist minima da aggiornare ogni volta:
+1. **Contenuto Italiano** (flusso operativo, filtri, note)
+2. **Contenuto English** (allineato semanticamente alla versione italiana)
+3. **Filtri** (comportamento corrente di `Client filter` e `Query search`)
+4. **Note operative** (prerequisiti, limiti, messaggi di comportamento)

@@ -1,0 +1,113 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="MySQLClientShow.App.Views.HelpWindow"
+        Title="Help / Aiuto"
+        WindowStartupLocation="CenterOwner"
+        Width="920"
+        Height="700"
+        MinWidth="760"
+        MinHeight="520"
+        mc:Ignorable="d">
+  <Grid Margin="16"
+        RowDefinitions="Auto,*,Auto">
+    <TextBlock Text="Help / Aiuto"
+               FontSize="22"
+               FontWeight="SemiBold" />
+
+    <TabControl Grid.Row="1"
+                Margin="0,12,0,12">
+      <TabItem Header="Italiano">
+        <ScrollViewer>
+          <StackPanel Margin="8"
+                      Spacing="10">
+            <TextBlock Text="Panoramica"
+                       FontSize="18"
+                       FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap"
+                       Text="MySQL Client Show monitora in tempo reale le query lette da mysql.general_log." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="Flusso base: inserisci la connection string, premi Start, osserva i risultati in griglia e premi Stop per fermare." />
+
+            <TextBlock Margin="0,8,0,0"
+                       Text="Filtri"
+                       FontSize="18"
+                       FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Client filter: confronto esatto su UserHost. Seleziona (Tutti i client) per vedere tutti i client." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Query search: supporta uno o piu termini separati da |, esempio: select|orders|where id." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Query search usa match OR e non distingue maiuscole/minuscole." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Con filtri attivi, i nuovi eventi non coerenti vengono scartati in ingresso e non vengono recuperati cambiando filtro dopo." />
+
+            <TextBlock Margin="0,8,0,0"
+                       Text="Note utili"
+                       FontSize="18"
+                       FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- L'app abilita/disabilita general_log automaticamente in Start/Stop." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Servono permessi MySQL per SET GLOBAL e lettura mysql.general_log." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Il polling e configurabile tra 200 e 60000 ms." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- La griglia e scrollabile; il buffer mantiene al massimo 5000 query. Oltre il limite, le piu vecchie vengono scartate automaticamente." />
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="English">
+        <ScrollViewer>
+          <StackPanel Margin="8"
+                      Spacing="10">
+            <TextBlock Text="Overview"
+                       FontSize="18"
+                       FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap"
+                       Text="MySQL Client Show monitors queries in real time from mysql.general_log." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="Basic flow: set the connection string, click Start, inspect grid rows, click Stop to end monitoring." />
+
+            <TextBlock Margin="0,8,0,0"
+                       Text="Filters"
+                       FontSize="18"
+                       FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Client filter: exact match on UserHost. Select (Tutti i client) to include every client." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Query search: one or more terms separated by |, example: select|orders|where id." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Query search is OR-based and case-insensitive." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- With active filters, incoming non-matching events are discarded and will not be restored by changing filters later." />
+
+            <TextBlock Margin="0,8,0,0"
+                       Text="Useful notes"
+                       FontSize="18"
+                       FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- The app enables/disables general_log automatically during Start/Stop." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- MySQL privileges are required for SET GLOBAL and mysql.general_log read access." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- Polling interval is configurable from 200 to 60000 ms." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- The grid is scrollable; the in-memory buffer keeps up to 5000 queries. Above that limit, the oldest rows are automatically discarded." />
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+
+    <StackPanel Grid.Row="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Spacing="8">
+      <Button Content="Chiudi / Close"
+              MinWidth="140"
+              Click="OnCloseClick" />
+    </StackPanel>
+  </Grid>
+</Window>

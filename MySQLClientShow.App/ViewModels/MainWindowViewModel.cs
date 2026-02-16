@@ -254,11 +254,12 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     {
         var finalStatus = "Monitoraggio fermo.";
         var hasError = false;
-        var fromTime = DateTime.UtcNow;
+        var fromTime = DateTime.MinValue;
 
         try
         {
             await _service.ConnectAndEnableAsync(connectionString, cancellationToken).ConfigureAwait(false);
+            fromTime = await _service.ReadServerCurrentTimestampAsync(cancellationToken).ConfigureAwait(false);
             RunOnUiThread(() =>
                 StatusMessage = $"Monitoraggio attivo. Polling: {PollingIntervalMs} ms.");
 
@@ -288,7 +289,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         catch (Exception ex)
         {
             hasError = true;
-            finalStatus = $"Errore monitoraggio: {ex.Message}";
+            finalStatus = BuildMonitorErrorMessage(ex);
         }
         finally
         {
@@ -316,10 +317,32 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         }
     }
 
+    private static string BuildMonitorErrorMessage(Exception ex)
+    {
+        var message = ex.InnerException is null
+            ? ex.Message
+            : $"{ex.Message} | {ex.InnerException.Message}";
+
+        if (message.Contains("Access denied", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"Errore monitoraggio: {message}. Verifica utente/password e host autorizzato.";
+        }
+
+        if (message.Contains("public key", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"Errore monitoraggio: {message}. Prova `AllowPublicKeyRetrieval=True` o una connessione SSL.";
+        }
+
+        return $"Errore monitoraggio: {message}";
+    }
+
     private void ClearBuffer()
     {
         ResetBuffer();
-        StatusMessage = IsRunning ? "Buffer svuotato. Monitoraggio attivo." : "Buffer svuotato.";
+        ResetClientFilters();
+        StatusMessage = IsRunning
+            ? "Buffer e filtri client svuotati. Monitoraggio attivo."
+            : "Buffer e filtri client svuotati.";
     }
 
 #if DEBUG
@@ -373,10 +396,17 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     private void AppendEntries(IReadOnlyList<GeneralLogEntry> rows)
     {
         var hasNewRows = false;
+        var selectedFilter = SelectedClientFilter;
+        var querySearchTerms = ParseQuerySearchTerms(QuerySearchFilter);
 
         foreach (var row in rows)
         {
             if (ShouldIgnore(row.SqlText))
+            {
+                continue;
+            }
+
+            if (!MatchesFilters(row, selectedFilter, querySearchTerms))
             {
                 continue;
             }
@@ -422,28 +452,24 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         UpdateCounters();
     }
 
+    private void ResetClientFilters()
+    {
+        ClientFilters.Clear();
+        ClientFilters.Add(AllClientsFilterOption);
+        SelectedClientFilter = AllClientsFilterOption;
+    }
+
     private void ApplyClientFilter()
     {
         FilteredEntries.Clear();
 
         var selectedFilter = SelectedClientFilter;
-        var includeAll = string.Equals(selectedFilter, AllClientsFilterOption, StringComparison.Ordinal);
-        var querySearchFilter = QuerySearchFilter;
-        var hasQuerySearchFilter = !string.IsNullOrWhiteSpace(querySearchFilter);
+        var querySearchTerms = ParseQuerySearchTerms(QuerySearchFilter);
         var matchingEntries = new List<GeneralLogEntry>();
 
         foreach (var entry in _allEntries)
         {
-            var matchesClient = includeAll ||
-                                string.Equals(entry.UserHost, selectedFilter, StringComparison.OrdinalIgnoreCase);
-            if (!matchesClient)
-            {
-                continue;
-            }
-
-            var matchesQuery = !hasQuerySearchFilter ||
-                               entry.SqlText.Contains(querySearchFilter, StringComparison.OrdinalIgnoreCase);
-            if (matchesQuery)
+            if (MatchesFilters(entry, selectedFilter, querySearchTerms))
             {
                 matchingEntries.Add(entry);
             }
@@ -502,6 +528,45 @@ public sealed class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     private static string NormalizeQuerySearchFilter(string? filter)
     {
         return string.IsNullOrWhiteSpace(filter) ? string.Empty : filter.Trim();
+    }
+
+    private static bool MatchesFilters(
+        GeneralLogEntry entry,
+        string selectedFilter,
+        IReadOnlyList<string> querySearchTerms)
+    {
+        var includeAll = string.Equals(selectedFilter, AllClientsFilterOption, StringComparison.Ordinal);
+        var matchesClient = includeAll ||
+                            string.Equals(entry.UserHost, selectedFilter, StringComparison.OrdinalIgnoreCase);
+        if (!matchesClient)
+        {
+            return false;
+        }
+
+        if (querySearchTerms.Count == 0)
+        {
+            return true;
+        }
+
+        foreach (var term in querySearchTerms)
+        {
+            if (entry.SqlText.Contains(term, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static IReadOnlyList<string> ParseQuerySearchTerms(string querySearchFilter)
+    {
+        if (string.IsNullOrWhiteSpace(querySearchFilter))
+        {
+            return Array.Empty<string>();
+        }
+
+        return querySearchFilter.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
     }
 
     private void EnsureClientFilterOption(string? option)

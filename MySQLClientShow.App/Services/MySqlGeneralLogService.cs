@@ -9,6 +9,7 @@ public sealed class MySqlGeneralLogService : IAsyncDisposable
     private const string EnableLogOutputSql = "SET GLOBAL log_output = 'TABLE';";
     private const string EnableGeneralLogSql = "SET GLOBAL general_log = 'ON';";
     private const string DisableGeneralLogSql = "SET GLOBAL general_log = 'OFF';";
+    private const string ReadServerNowSql = "SELECT CURRENT_TIMESTAMP(6);";
 
     private const string ReadGeneralLogSql = """
                                              SELECT
@@ -39,7 +40,8 @@ public sealed class MySqlGeneralLogService : IAsyncDisposable
             return;
         }
 
-        var connection = new MySqlConnection(connectionString);
+        var normalizedConnectionString = NormalizeConnectionString(connectionString);
+        var connection = new MySqlConnection(normalizedConnectionString);
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
         try
@@ -54,6 +56,25 @@ public sealed class MySqlGeneralLogService : IAsyncDisposable
         }
 
         _connection = connection;
+    }
+
+    public async Task<DateTime> ReadServerCurrentTimestampAsync(CancellationToken cancellationToken)
+    {
+        if (_connection is null)
+        {
+            throw new InvalidOperationException("Connection is not initialized.");
+        }
+
+        await using var command = _connection.CreateCommand();
+        command.CommandText = ReadServerNowSql;
+
+        var value = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        if (value is DateTime serverTime)
+        {
+            return serverTime;
+        }
+
+        throw new InvalidOperationException("Unable to read server current timestamp.");
     }
 
     public async Task<IReadOnlyList<GeneralLogEntry>> ReadEntriesAsync(
@@ -140,5 +161,18 @@ public sealed class MySqlGeneralLogService : IAsyncDisposable
         await using var command = connection.CreateCommand();
         command.CommandText = commandText;
         await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private static string NormalizeConnectionString(string connectionString)
+    {
+        var normalized = connectionString.Trim();
+        if (normalized.Length >= 2 &&
+            ((normalized[0] == '"' && normalized[^1] == '"') ||
+             (normalized[0] == '\'' && normalized[^1] == '\'')))
+        {
+            normalized = normalized[1..^1].Trim();
+        }
+
+        return normalized;
     }
 }

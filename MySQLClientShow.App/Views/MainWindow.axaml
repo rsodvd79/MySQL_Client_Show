@@ -20,7 +20,7 @@
     <Grid Grid.Row="1"
           Margin="0,12,0,12"
           RowDefinitions="Auto,Auto,Auto"
-          ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto">
+          ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto,Auto">
       <TextBlock Grid.Row="0"
                  Grid.Column="0"
                  Margin="0,0,10,0"
@@ -57,9 +57,19 @@
 
       <Button Grid.Row="0"
               Grid.Column="5"
+              Margin="0,0,10,0"
               Click="OnExportCsvClick"
               Content="Export CSV"
               MinWidth="110" />
+
+      <Button Grid.Row="0"
+              Grid.Column="6"
+              Width="34"
+              Height="32"
+              FontWeight="Bold"
+              Content="?"
+              ToolTip.Tip="Help / Aiuto"
+              Click="OnHelpClick" />
 
       <TextBlock Grid.Row="1"
                  Grid.Column="0"
@@ -102,9 +112,9 @@
 
       <TextBox Grid.Row="2"
                Grid.Column="1"
-               Grid.ColumnSpan="5"
+               Grid.ColumnSpan="6"
                Margin="0,10,0,0"
-               Watermark="Ricerca parziale nel testo SQL (es. select, orders, where id)"
+               Watermark="Ricerca SQL (es. select|orders|where id)"
                Text="{Binding QuerySearchFilter, Mode=TwoWay}" />
     </Grid>
 
