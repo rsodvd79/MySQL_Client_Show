@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
     <UseAppHost>true</UseAppHost>
-    <AssemblyVersion>2026.2.16.1308</AssemblyVersion>
-    <FileVersion>2026.2.16.1308</FileVersion>
+    <AssemblyVersion>2026.2.16.1558</AssemblyVersion>
+    <FileVersion>2026.2.16.1558</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
