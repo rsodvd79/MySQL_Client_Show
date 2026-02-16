@@ -56,6 +56,8 @@
             <TextBlock TextWrapping="Wrap"
                        Text="- Il titolo finestra mostra la versione del programma (es. v2026.2.16.1308)." />
             <TextBlock TextWrapping="Wrap"
+                       Text="- Se la dimensione iniziale supera lo schermo disponibile, la finestra principale viene massimizzata automaticamente all'avvio." />
+            <TextBlock TextWrapping="Wrap"
                        Text="- Il polling e configurabile tra 200 e 60000 ms." />
             <TextBlock TextWrapping="Wrap"
                        Text="- La griglia e scrollabile; il buffer mantiene al massimo 5000 query. Oltre il limite, le piu vecchie vengono scartate automaticamente." />
@@ -100,6 +102,8 @@
                        Text="- After 1 hour of continuous monitoring, the status bar shows a warning that mysql.general_log is growing." />
             <TextBlock TextWrapping="Wrap"
                        Text="- The window title shows the program version (for example v2026.2.16.1308)." />
+            <TextBlock TextWrapping="Wrap"
+                       Text="- If the initial window size exceeds the available screen area, the main window is automatically maximized on startup." />
             <TextBlock TextWrapping="Wrap"
                        Text="- Polling interval is configurable from 200 to 60000 ms." />
             <TextBlock TextWrapping="Wrap"

@@ -89,7 +89,7 @@ Componenti principali:
 - `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
 - `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
 - `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, campo `Query search` per ricerca parziale nel testo SQL, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`, `Copia query in clipboard`), pulsante `?` per Help.
-- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard; apertura finestra Help dal pulsante `?`; su macOS imposta l'icona finestra via asset PNG in best effort; imposta il titolo finestra runtime includendo versione programma (`MySQL Client Show - vX.Y.Z.W`).
+- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard; apertura finestra Help dal pulsante `?`; su macOS imposta l'icona finestra via asset PNG in best effort; imposta il titolo finestra runtime includendo versione programma (`MySQL Client Show - vX.Y.Z.W`); all'apertura della finestra, se le dimensioni richieste superano l'area visibile dello schermo corrente, imposta automaticamente `WindowState = Maximized`.
 - `MySQLClientShow.App/Views/HelpWindow.axaml`: finestra Help con contenuti bilingue Italiano/English su funzionamento generale e filtri.
 - `MySQLClientShow.App/Views/HelpWindow.axaml.cs`: code-behind della finestra Help (chiusura dialog).
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml`: finestra dedicata al dettaglio query (timestamp, client, SQL) con area testo read-only e scrollbar.
@@ -113,6 +113,7 @@ Vincoli polling implementati:
 
 Verifica effettuata:
 - `dotnet build MySQLClientShow.sln` -> successo (0 errori, 0 warning).
+- `dotnet build MySQLClientShow.App/MySQLClientShow.App.csproj` -> successo (0 errori, 0 warning).
 
 ---
 
@@ -126,6 +127,7 @@ Verifica effettuata:
    - impostare `Polling (ms)` (default `1000`, range `200..60000`)
    - premere `Start`
    - monitorare risultati nel DataGrid
+   - se la finestra iniziale eccede lo schermo disponibile, viene massimizzata automaticamente
    - usare `Client filter` (dropdown auto-popolata) per filtrare `UserHost`
    - usare `Query search` per ricerca parziale nel testo SQL (case-insensitive)
    - se il monitoraggio resta attivo per oltre 1 ora, controllare il warning in status bar sulla crescita del log

@@ -31,6 +31,7 @@ public partial class MainWindow : Window
         }
 
         Closing += OnClosing;
+        Opened += OnOpened;
     }
 
     private void InitializeComponent()
@@ -227,6 +228,42 @@ public partial class MainWindow : Window
 
         _closeAfterStop = true;
         Close();
+    }
+
+    private void OnOpened(object? sender, EventArgs e)
+    {
+        MaximizeIfLargerThanScreen();
+    }
+
+    private void MaximizeIfLargerThanScreen()
+    {
+        if (WindowState == WindowState.Maximized)
+        {
+            return;
+        }
+
+        var screen = Screens.ScreenFromVisual(this) ?? Screens.Primary;
+        if (screen is null)
+        {
+            return;
+        }
+
+        var scaling = screen.Scaling > 0 ? screen.Scaling : 1d;
+        var availableWidth = screen.WorkingArea.Width / scaling;
+        var availableHeight = screen.WorkingArea.Height / scaling;
+
+        var requestedWidth = !double.IsNaN(Width) ? Width : Bounds.Width;
+        var requestedHeight = !double.IsNaN(Height) ? Height : Bounds.Height;
+
+        if (requestedWidth <= 0 || requestedHeight <= 0)
+        {
+            return;
+        }
+
+        if (requestedWidth > availableWidth || requestedHeight > availableHeight)
+        {
+            WindowState = WindowState.Maximized;
+        }
     }
 
     private List<GeneralLogEntry> GetRowsForExport()

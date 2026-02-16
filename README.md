@@ -37,6 +37,7 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Dopo 1 ora di monitoraggio continuo (`Start` attivo), nel footer compare un avviso: la tabella `mysql.general_log` sta crescendo.
 - Titolo finestra con versione programma evidenziata (es. `MySQL Client Show - v2026.2.16.1308`).
 - Finestra principale centrata automaticamente all'avvio (`CenterScreen`).
+- Se la dimensione iniziale della finestra supera lo schermo corrente, la finestra viene massimizzata automaticamente all'avvio.
 - Su macOS, la finestra applica esplicitamente l'icona da PNG per migliorare la visualizzazione nel runtime desktop.
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
 - In chiusura app, se il polling e' attivo viene forzata la procedura di `Stop` prima dell'uscita.
@@ -123,6 +124,7 @@ ORDER BY event_time ASC;
 - In caso di errori di autenticazione/handshake, lo stato mostra suggerimenti (es. host autorizzato, `AllowPublicKeyRetrieval=True`, SSL).
 - Se un evento viene scartato per filtro in fase di ingresso, non verra recuperato automaticamente cambiando filtro in seguito.
 - La griglia e' scrollabile, ma il buffer resta limitato alle ultime `5000` query.
+- In avvio, se la finestra richiesta e' piu grande dell'area visibile monitor, l'app passa automaticamente a finestra massimizzata.
 
 ## Struttura progetto
 ```text
