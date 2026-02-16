@@ -114,6 +114,15 @@ Vincoli polling implementati:
 Verifica effettuata:
 - `dotnet build MySQLClientShow.sln` -> successo (0 errori, 0 warning).
 - `dotnet build MySQLClientShow.App/MySQLClientShow.App.csproj` -> successo (0 errori, 0 warning).
+- `dotnet test MySQLClientShow.Tests/MySQLClientShow.Tests.csproj` -> successo (72 test, 0 falliti).
+
+Progetto test:
+- `MySQLClientShow.Tests/MySQLClientShow.Tests.csproj`: progetto xUnit .NET 8 con test unitari.
+- `MySQLClientShow.Tests/SqlQueryFormatterTests.cs`: 18 test per `SqlQueryFormatter` (null/empty input, keyword uppercasing, compound keywords, stringhe letterali, commenti, parentesi, operatori, join, query complesse).
+- `MySQLClientShow.Tests/AppConfigurationTests.cs`: 2 test per `AppConfiguration` (valori default, set/get proprieta).
+- `MySQLClientShow.Tests/JsonAppConfigurationStoreTests.cs`: 5 test per `JsonAppConfigurationStore` (load sicuro, round-trip save/load, serializzazione/deserializzazione JSON, JSON vuoto).
+- `MySQLClientShow.Tests/GeneralLogEntryTests.cs`: 3 test per `GeneralLogEntry` (proprieta, precisione microsecondo, query complesse).
+- `MySQLClientShow.Tests/MainWindowViewModelTests.cs`: 44 test per `MainWindowViewModel` (polling interval clamping, connection string, client filter, query search filter, configurazione round-trip, comandi, stato).
 
 ---
 
