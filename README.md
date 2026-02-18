@@ -40,6 +40,13 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 - Se la dimensione iniziale della finestra supera lo schermo corrente, la finestra viene massimizzata automaticamente all'avvio.
 - Se la connessione MySQL cade durante il monitoraggio, il polling non si ferma: l'app tenta la riconnessione automatica ogni 2 secondi.
 - Su macOS, la finestra applica esplicitamente l'icona da PNG per migliorare la visualizzazione nel runtime desktop.
+- Su macOS, l'icona Dock viene impostata esplicitamente a runtime dal PNG applicativo (best effort) per evitare l'icona vuota.
+- Su macOS, dopo la build viene generato automaticamente anche il bundle `MySQLClientShow.App.app` con `Info.plist` e icona `.icns` per evitare icona vuota in Finder.
+- Su macOS, il menu applicazione nella barra dei menu usa il nome `MySQL Client Show` invece del fallback `Avalonia`.
+- Su macOS, la voce di default `About Avalonia` e' rimossa; la chiusura resta disponibile in `File -> Quit MySQL Client Show`.
+- Su macOS, il menu applicazione (prima voce, con nome app) viene impostato esplicitamente senza voci di default Avalonia.
+- Su macOS, non viene aggiunto un secondo menu `MySQL Client Show` nella barra dei menu.
+- Su macOS, nel menu `File` sono disponibili anche le azioni della toolbar: `Start`, `Stop`, `Clear`, `Export CSV` e `Help / Aiuto (?)`.
 - Configurazione persistente in JSON caricata all'avvio e salvata in uscita.
 - In chiusura app, se il polling e' attivo viene forzata la procedura di `Stop` prima dell'uscita.
 - In build `Debug`, all'avvio vengono caricati automaticamente 5 record demo nella griglia.
@@ -67,6 +74,10 @@ dotnet build MySQLClientShow.sln -c Release
 dotnet run --project MySQLClientShow.App
 ```
 
+Su macOS, dopo `dotnet build`, il bundle applicativo e' disponibile in:
+
+`MySQLClientShow.App/bin/Debug/net8.0/MySQLClientShow.App.app`
+
 ## Utilizzo
 1. Inserisci la connection string.
 2. Imposta il polling (default `1000 ms`).
@@ -81,6 +92,60 @@ dotnet run --project MySQLClientShow.App
 11. Premi `Clear` per svuotare i dati e ripulire la lista `Client filter`.
 12. Premi `Stop` per fermare il monitoraggio, disattivare `general_log` e svuotare `mysql.general_log`.
 13. Se chiudi la finestra con monitoraggio attivo, l'app esegue prima lo stop polling e poi termina.
+14. Su macOS puoi richiamare da menu `File` le stesse azioni dei pulsanti: `Start`, `Stop`, `Clear`, `Export CSV` e `Help / Aiuto (?)`.
+
+## Diagramma finestre e funzioni
+```mermaid
+flowchart TB
+  subgraph UI["UI Avalonia"]
+    MW["MainWindow<br/>Connection string, Start/Stop/Clear/Export CSV<br/>Client filter, Query search, Polling interval<br/>DataGrid + Status bar"]
+    HW["HelpWindow<br/>Guida bilingue IT/EN<br/>Flusso operativo, filtri, note"]
+    QW["QueryDetailWindow<br/>Timestamp + UserHost + SQL formattata<br/>Copia SQL in clipboard"]
+  end
+
+  subgraph VM["MVVM Layer"]
+    MVM["MainWindowViewModel<br/>Comandi e polling asincrono<br/>Dedup + buffer max 5000<br/>Ordinamento timestamp DESC<br/>Riconnessione automatica ogni 2s"]
+    FIL["Filtri runtime<br/>Client filter (dropdown dinamica)<br/>Query search case-insensitive<br/>Multi-termine OR con separatore |"]
+  end
+
+  subgraph SVC["Services"]
+    GLS["MySqlGeneralLogService<br/>Connect / Disconnect<br/>Enable/Disable general_log<br/>TRUNCATE mysql.general_log<br/>ReadGeneralLog(fromTime, userHostLike)"]
+    CFG["JsonAppConfigurationStore<br/>Load in avvio / Save in uscita"]
+    FMT["SqlQueryFormatter<br/>Formattazione query SQL"]
+  end
+
+  subgraph EXT["Risorse esterne"]
+    MYSQL["Server MySQL<br/>mysql.general_log (TABLE)<br/>SET GLOBAL / SELECT / TRUNCATE"]
+    FILE["%LOCALAPPDATA%\\MySQLClientShow\\appconfig.json"]
+  end
+
+  MW -->|"Data binding + ICommand"| MVM
+  MW -->|"Pulsante ?"| HW
+  MW -->|"Doppio click o menu contestuale"| QW
+  QW -->|"Format SQL"| FMT
+
+  MVM -->|"Start"| GLS
+  GLS -->|"SET GLOBAL log_output='TABLE'<br/>SET GLOBAL general_log='ON'"| MYSQL
+  MVM -->|"Polling ogni N ms"| GLS
+  GLS -->|"SELECT mysql.general_log (command_type='Query')"| MYSQL
+  GLS -->|"event_time, user_host, sql_text"| MVM
+  MVM --> FIL
+  FIL -->|"Eventi coerenti con i filtri"| MVM
+  MVM -->|"Aggiorna DataGrid e Status bar"| MW
+  MVM -->|"Aggiorna elenco Client filter osservati"| MW
+  MVM -->|"Warning dopo 1 ora: crescita general_log"| MW
+
+  MVM -->|"Stop"| GLS
+  GLS -->|"SET GLOBAL general_log='OFF'<br/>TRUNCATE TABLE mysql.general_log"| MYSQL
+
+  MVM <-->|"Load/Save configurazione"| CFG
+  CFG <--> FILE
+
+  MW -->|"OnClosing con monitoraggio attivo"| MVM
+  MVM -->|"Stop prima dell'uscita"| GLS
+  MVM -.->|"Errore connessione"| MW
+  MVM -.->|"Retry automatico ogni 2s finche disponibile o Stop"| GLS
+```
 
 ## Configurazione JSON
 La configurazione utente viene persistita in:

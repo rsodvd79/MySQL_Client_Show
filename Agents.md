@@ -85,12 +85,12 @@ Implementato e compilabile.
 Componenti principali:
 - `README.md`: documentazione GitHub (overview, setup, uso, configurazione JSON, note operative).
 - `.gitignore`: esclusione artefatti di build (`bin/`, `obj/`) dal versionamento.
-- `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` (Windows), `UseAppHost` e inclusione risorse `Assets`.
-- `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia.
-- `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita.
+- `MySQLClientShow.App/MySQLClientShow.App.csproj`: dipendenze Avalonia, DataGrid, MVVM Toolkit, MySqlConnector, `ApplicationIcon` (Windows), `UseAppHost` e inclusione risorse `Assets`; su macOS crea automaticamente post-build il bundle `MySQLClientShow.App.app` con struttura `Contents` (`MacOS`, `Resources`), `Info.plist` e icona `mysql-client-show.icns`.
+- `MySQLClientShow.App/Program.cs`: bootstrap desktop Avalonia; su macOS imposta `MacOSPlatformOptions.DisableDefaultApplicationMenuItems = true` per rimuovere i menu item di default (incluso `About Avalonia`).
+- `MySQLClientShow.App/App.axaml` e `MySQLClientShow.App/App.axaml.cs`: tema Fluent, caricamento config JSON in avvio e salvataggio config in uscita; impostazione esplicita del nome applicazione (`MySQL Client Show`) usato dal menu app su macOS al posto del fallback `Avalonia`; configurazione menu macOS con menu applicazione impostato esplicitamente (senza voci di default Avalonia, quindi senza `About Avalonia`) e menu finestra custom `File` che include `Start`, `Stop`, `Clear`, `Export CSV`, `Help / Aiuto (?)` e `Quit MySQL Client Show`, evitando anche la duplicazione di un secondo menu `MySQL Client Show` in barra; impostazione best effort dell'icona Dock via API nativa macOS partendo dal PNG asset.
 - `MySQLClientShow.App/Views/MainWindow.axaml`: UI con connection string, Start/Stop, filtro client via dropdown, campo `Query search` per ricerca parziale nel testo SQL, polling interval (`NumericUpDown`), DataGrid, status/count, icona finestra, apertura centrata (`CenterScreen`), doppio click riga e menu contestuale (`Apri dettaglio query`, `Copia query in clipboard`), pulsante `?` per Help.
-- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard; apertura finestra Help dal pulsante `?`; su macOS imposta l'icona finestra via asset PNG in best effort; imposta il titolo finestra runtime includendo versione programma (`MySQL Client Show - vX.Y.Z.W`); all'apertura della finestra, se le dimensioni richieste superano l'area visibile dello schermo corrente, imposta automaticamente `WindowState = Maximized`.
-- `MySQLClientShow.App/Views/HelpWindow.axaml`: finestra Help con contenuti bilingue Italiano/English su funzionamento generale e filtri.
+- `MySQLClientShow.App/Views/MainWindow.axaml.cs`: intercetta la chiusura finestra e forza la procedura di stop polling prima di uscire; gestione doppio click e menu contestuale per aprire il dettaglio query o copiare `SqlText` in clipboard; apertura finestra Help dal pulsante `?`; su macOS imposta l'icona finestra via asset PNG in best effort; imposta il titolo finestra runtime includendo versione programma (`MySQL Client Show - vX.Y.Z.W`); all'apertura della finestra, se le dimensioni richieste superano l'area visibile dello schermo corrente, imposta automaticamente `WindowState = Maximized`; espone metodi riusabili dal menu `File` per richiamare le stesse azioni dei pulsanti (`Start`, `Stop`, `Clear`, `Export CSV`, `Help`).
+- `MySQLClientShow.App/Views/HelpWindow.axaml`: finestra Help con contenuti bilingue Italiano/English su funzionamento generale e filtri; note operative aggiornate sul menu app macOS (rimozione `About Avalonia`, menu applicazione senza voci default Avalonia, menu `File` con azioni `Start/Stop/Clear/Export CSV/Help`, chiusura via `File -> Quit MySQL Client Show`, assenza duplicazione menu `MySQL Client Show`, icona Dock esplicitamente impostata, bundle `.app` generato con icona Finder corretta).
 - `MySQLClientShow.App/Views/HelpWindow.axaml.cs`: code-behind della finestra Help (chiusura dialog).
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml`: finestra dedicata al dettaglio query (timestamp, client, SQL) con area testo read-only e scrollbar.
 - `MySQLClientShow.App/Views/QueryDetailWindow.axaml.cs`: code-behind finestra dettaglio, apertura modal, copia SQL negli appunti, chiusura.
@@ -114,6 +114,14 @@ Vincoli polling implementati:
 Verifica effettuata:
 - `dotnet build MySQLClientShow.sln` -> successo (0 errori, 0 warning).
 - `dotnet build MySQLClientShow.App/MySQLClientShow.App.csproj` -> successo (0 errori, 0 warning).
+- `dotnet build MySQLClientShow.sln` (post-fix nome menu macOS) -> successo (0 errori, 0 warning).
+- `dotnet build MySQLClientShow.sln` (post-rimozione `About Avalonia` su macOS) -> successo (0 errori, 0 warning).
+- `dotnet build MySQLClientShow.sln` (post-fix duplicazione menu `MySQL Client Show` su macOS) -> successo (0 errori, 0 warning).
+- `dotnet build MySQLClientShow.sln` (post-fix definitivo rimozione `About Avalonia` via menu applicazione custom) -> successo (0 errori, 0 warning).
+- `dotnet build MySQLClientShow.sln` (post-aggiunta azioni `Start/Stop/Clear/Export CSV/Help` nel menu `File` macOS) -> successo (0 errori, 0 warning).
+- `dotnet build MySQLClientShow.sln` (post-fix icona Dock macOS) -> successo (0 errori, 0 warning).
+- `dotnet build MySQLClientShow.sln` (post-fix icona bundle `.app` macOS in Finder) -> successo (0 errori, 0 warning).
+- `plutil -p MySQLClientShow.App/bin/Debug/net8.0/MySQLClientShow.App.app/Contents/Info.plist` -> confermati `CFBundleIconFile = mysql-client-show.icns` e metadati bundle.
 
 ---
 
@@ -135,6 +143,13 @@ Verifica effettuata:
    - aprire dettaglio query con doppio click su riga oppure con `tasto destro` -> `Apri dettaglio query`
    - copiare rapidamente la query con `tasto destro` -> `Copia query in clipboard`
    - aprire l'help bilingue con il pulsante `?`
+   - su macOS, verificare nella barra menu che il menu applicazione mostri `MySQL Client Show` (non `Avalonia`)
+   - su macOS, verificare che la voce `About Avalonia` non sia presente
+   - su macOS, verificare che il menu applicazione (prima voce) non mostri voci di default Avalonia
+   - su macOS, verificare che il menu `File` includa `Start`, `Stop`, `Clear`, `Export CSV` e `Help / Aiuto (?)`, equivalenti ai pulsanti toolbar
+   - su macOS, verificare che nel Dock venga mostrata l'icona applicativa (non icona vuota)
+   - su macOS, dopo la build verificare il bundle `MySQLClientShow.App/bin/Debug/net8.0/MySQLClientShow.App.app` e l'icona corretta in Finder
+   - su macOS, verificare che la chiusura sia disponibile in `File -> Quit MySQL Client Show` e che non compaia un secondo menu `MySQL Client Show`
    - nella finestra dettaglio usare `Copia SQL` per copiare la query formattata
    - premere `Stop` per disattivare `general_log`, svuotare `mysql.general_log` e chiudere sessione
 4. Chiusura app:
