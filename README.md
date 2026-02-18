@@ -62,7 +62,8 @@ Desktop app Windows in **C#/.NET 8 + Avalonia** per monitorare in tempo reale le
 ## Avvio rapido
 ```bash
 dotnet restore
-dotnet build MySQLClientShow.sln
+dotnet build MySQLClientShow.sln 
+dotnet build MySQLClientShow.sln -c Release
 dotnet run --project MySQLClientShow.App
 ```
 
