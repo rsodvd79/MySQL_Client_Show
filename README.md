@@ -78,6 +78,21 @@ Su macOS, dopo `dotnet build`, il bundle applicativo e' disponibile in:
 
 `MySQLClientShow.App/bin/Debug/net8.0/MySQLClientShow.App.app`
 
+## Pubblicare una release
+Il workflow CI pubblica automaticamente una GitHub Release quando si crea un tag `v*` su `main`:
+
+```bash
+git tag v2026.2.19.1
+git push origin v2026.2.19.1
+```
+
+Il job `release` del workflow `publish.yml`:
+1. Attende il completamento della build per Windows (`win-x64`) e macOS (`macos-arm64`).
+2. Scarica i due artifact ZIP prodotti.
+3. Crea una GitHub Release con nome `MySQL Client Show <tag>` e note di rilascio generate automaticamente, allegando:
+   - `MySQLClientShow-win-x64-<tag>.zip`
+   - `MySQLClientShow-macos-arm64-<tag>.zip`
+
 ## Utilizzo
 1. Inserisci la connection string.
 2. Imposta il polling (default `1000 ms`).

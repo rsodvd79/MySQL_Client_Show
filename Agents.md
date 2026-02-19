@@ -123,6 +123,7 @@ Verifica effettuata:
 - `dotnet build MySQLClientShow.sln` (post-fix icona bundle `.app` macOS in Finder) -> successo (0 errori, 0 warning).
 - `plutil -p MySQLClientShow.App/bin/Debug/net8.0/MySQLClientShow.App.app/Contents/Info.plist` -> confermati `CFBundleIconFile = mysql-client-show.icns` e metadati bundle.
 - `.github/workflows/publish.yml` (post-fix step `Create Windows ZIP`): aggiunto step PowerShell `Compress-Archive` per creare `MySQLClientShow.zip` su Windows prima dell'upload artifact (in precedenza il file ZIP non veniva mai creato su Windows e l'upload veniva saltato con warning).
+- `.github/workflows/publish.yml` (auto-release): aggiunto trigger `tags: ["v*"]` e job `release` (dipende da `publish`) che scarica i due artifact (win-x64, macos-arm64), li rinomina includendo il tag e crea automaticamente una GitHub Release con `softprops/action-gh-release@v2` (note di rilascio generate automaticamente, non draft, non prerelease).
 
 ---
 
