@@ -89,12 +89,11 @@ jobs:
           # ZIP "corretto" per macOS (preserva risorse/attributi)
           ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE" "artifacts/${{ matrix.rid }}/${APP_NAME}.zip"
 
-      - name: Upload artifact (Windows: publish folder)
-        if: runner.os == 'Windows'
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifactName }}
-          path: artifacts/${{ matrix.rid }}/publish
+          path: artifacts/VideoMap/${{ matrix.rid }}
 
       - name: Upload artifact (macOS: .app zip)
         if: runner.os == 'macOS'
