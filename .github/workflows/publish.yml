@@ -89,6 +89,14 @@ jobs:
           # ZIP "corretto" per macOS (preserva risorse/attributi)
           ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE" "artifacts/${{ matrix.rid }}/${APP_NAME}.zip"
 
+      # Crea ZIP su Windows
+      - name: Create Windows ZIP
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "artifacts/${{ matrix.rid }}/publish/*" `
+            -DestinationPath "artifacts/${{ matrix.rid }}/MySQLClientShow.zip"
+
       - name: Upload artifact
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
