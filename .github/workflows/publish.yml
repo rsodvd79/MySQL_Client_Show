@@ -35,16 +35,26 @@ jobs:
       - name: Restore
         run: dotnet restore "MySQLClientShow.App/MySQLClientShow.App.csproj"
 
-      - name: Publish
+      - name: Publish (Windows)
+        if: runner.os == 'Windows'
         run: >
           dotnet publish "MySQLClientShow.App/MySQLClientShow.App.csproj"
-          -c Release
-          -r ${{ matrix.rid }}
+          -c Release -r ${{ matrix.rid }}
           --self-contained true
           /p:PublishSingleFile=true
-          /p:DebugType=None
-          /p:DebugSymbols=false
+          /p:DebugType=None /p:DebugSymbols=false
           -o "artifacts/${{ matrix.rid }}"
+      
+      - name: Publish (macOS)
+        if: runner.os == 'macOS'
+        run: >
+          dotnet publish "MySQLClientShow.App/MySQLClientShow.App.csproj"
+          -c Release -r ${{ matrix.rid }}
+          --self-contained true
+          /p:PublishSingleFile=false
+          /p:DebugType=None /p:DebugSymbols=false
+          -o "artifacts/${{ matrix.rid }}"
+
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
