@@ -1,4 +1,4 @@
-name: build-and-publish
+name: MySQLClientShow build & publish
 
 on:
   push:
@@ -10,7 +10,6 @@ on:
 jobs:
   publish:
     runs-on: ${{ matrix.os }}
-
     strategy:
       fail-fast: false
       matrix:
@@ -18,46 +17,88 @@ jobs:
           - os: windows-latest
             rid: win-x64
             artifactName: MySQLClientShow-win-x64
-
           - os: macos-latest
             rid: osx-arm64
             artifactName: MySQLClientShow-macos-arm64
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
 
       - name: Restore
         run: dotnet restore "MySQLClientShow.App/MySQLClientShow.App.csproj"
 
-      - name: Publish (Windows)
-        if: runner.os == 'Windows'
-        run: >
-          dotnet publish "MySQLClientShow.App/MySQLClientShow.App.csproj"
-          -c Release -r ${{ matrix.rid }}
-          --self-contained true
-          /p:PublishSingleFile=true
-          /p:DebugType=None /p:DebugSymbols=false
-          -o "artifacts/${{ matrix.rid }}"
-      
-      - name: Publish (macOS)
+      - name: Publish
+        shell: bash
+        run: |
+          dotnet publish "MySQLClientShow.App/MySQLClientShow.App.csproj" \
+            -c Release \
+            -r "${{ matrix.rid }}" \
+            --self-contained true \
+            -p:UseAppHost=true \
+            -p:PublishSingleFile=false \
+            -p:DebugType=None -p:DebugSymbols=false \
+            -o "artifacts/${{ matrix.rid }}/publish"
+
+      # Crea .app solo su macOS
+      - name: Create macOS .app bundle
         if: runner.os == 'macOS'
-        run: >
-          dotnet publish "MySQLClientShow.App/MySQLClientShow.App.csproj"
-          -c Release -r ${{ matrix.rid }}
-          --self-contained true
-          /p:PublishSingleFile=false
-          /p:DebugType=None /p:DebugSymbols=false
-          -o "artifacts/${{ matrix.rid }}"
+        shell: bash
+        run: |
+          set -euo pipefail
 
+          PUBLISH_DIR="artifacts/${{ matrix.rid }}/publish"
+          APP_NAME="MySQLClientShow"
+          APP_BUNDLE="artifacts/${{ matrix.rid }}/${APP_NAME}.app"
 
-      - name: Upload artifact
+          # Trova l'apphost (eseguibile) nella cartella publish
+          APP_EXE="$(find "$PUBLISH_DIR" -maxdepth 1 -type f -perm -111 \
+            ! -name "*.dll" ! -name "*.pdb" ! -name "*.json" ! -name "*.config" \
+            | head -n 1 | xargs -I{} basename "{}")"
+
+          if [ -z "$APP_EXE" ]; then
+            echo "Impossibile trovare l'eseguibile (apphost) in $PUBLISH_DIR"
+            ls -la "$PUBLISH_DIR"
+            exit 1
+          fi
+
+          mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
+          cp -R "$PUBLISH_DIR/"* "$APP_BUNDLE/Contents/MacOS/"
+          chmod +x "$APP_BUNDLE/Contents/MacOS/$APP_EXE"
+
+          # Info.plist minimo
+          cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleName</key><string>${APP_NAME}</string>
+            <key>CFBundleDisplayName</key><string>${APP_NAME}</string>
+            <key>CFBundleIdentifier</key><string>com.biemme.${APP_NAME}</string>
+            <key>CFBundleVersion</key><string>1.0.0</string>
+            <key>CFBundleShortVersionString</key><string>1.0.0</string>
+            <key>CFBundleExecutable</key><string>${APP_EXE}</string>
+            <key>NSHighResolutionCapable</key><true/>
+          </dict>
+          </plist>
+          EOF
+
+          # ZIP "corretto" per macOS (preserva risorse/attributi)
+          ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE" "artifacts/${{ matrix.rid }}/${APP_NAME}.zip"
+
+      - name: Upload artifact (Windows: publish folder)
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifactName }}
-          path: artifacts/${{ matrix.rid }}
+          path: artifacts/${{ matrix.rid }}/publish
+
+      - name: Upload artifact (macOS: .app zip)
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifactName }}
+          path: artifacts/${{ matrix.rid }}/MySQLClientShow.zip
