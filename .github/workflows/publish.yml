@@ -20,10 +20,6 @@ jobs:
             artifactName: MySQLClientShow-win-x64
 
           - os: macos-latest
-            rid: osx-x64
-            artifactName: MySQLClientShow-macos-x64
-
-          - os: macos-latest
             rid: osx-arm64
             artifactName: MySQLClientShow-macos-arm64
 
