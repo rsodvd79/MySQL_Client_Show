@@ -93,6 +93,11 @@ Il job `release` del workflow `publish.yml`:
    - `MySQLClientShow-win-x64-<tag>.zip`
    - `MySQLClientShow-macos-arm64-<tag>.zip`
 
+Trigger CI principali del workflow `publish.yml`:
+- `push` su `main` (build/publish matrix Windows + macOS)
+- `pull_request` su `main` con eventi `opened`, `synchronize` (sync PR) e `reopened` (build/publish matrix Windows + macOS)
+- `push` di tag `v*` (oltre alla matrix, attiva anche il job `release`)
+
 ## Utilizzo
 1. Inserisci la connection string.
 2. Imposta il polling (default `1000 ms`).
